@@ -1,0 +1,13 @@
+[backup]
+remote_name = "GoogleDrive"
+root_dir = "Backups/My PC/"
+sync_paths = [
+  "~/test/test_dir"
+  "~/test/test_file"
+  "/etc/motd"
+]
+
+backup_paths = [
+  "~/test_2/1.dat"
+  "/etc/motd"
+]
