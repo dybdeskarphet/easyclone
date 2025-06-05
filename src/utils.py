@@ -8,7 +8,7 @@ def log(message: str, logtype: LogLevel | BackupLog) -> None:
     match logtype:
         case LogLevel.ERROR | BackupLog.ERR:
             # RED
-            color = "\033[31;1m]"
+            color = "\033[31;1m"
         case LogLevel.LOG:
             # BLUE
             color = "\033[34;1m"
