@@ -6,6 +6,12 @@ class LogLevel(Enum):
     INFO = "info"
     WARN = "warn"
 
+class BackupLog(Enum):
+    OK = "✓"
+    ERR = "⛌"
+    WAIT = ""
+
+
 class CommandType(Enum):
     COPY = "copy"
     SYNC = "sync"
