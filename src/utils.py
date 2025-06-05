@@ -47,7 +47,10 @@ def organize_paths(paths: list[str], remote_name: str, root_dir: str) -> list[di
 
     return source_dest_array
 
-def collapse_user(path: str) -> str:
+def collapseuser(path: str) -> str:
+    """
+    Opposite of path.expanduser()
+    """
     home = os.path.expanduser("~")
     if path.startswith(home):
         return path.replace(home, "~", 1)

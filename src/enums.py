@@ -19,3 +19,7 @@ class CommandType(Enum):
 class PathType(Enum):
     FILE = "file"
     DIR = "dir"
+
+class BackupStatus(Enum):
+    IN_PROGRESS = "in_progress"
+    FINISHED = "finished"

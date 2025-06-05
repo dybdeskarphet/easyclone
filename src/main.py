@@ -1,8 +1,8 @@
 import asyncio
 from config import get_config_value, load_config
-from enums import CommandType, LogLevel
+from enums import CommandType
 from rclone import backup
-from utils import log, organize_paths
+from utils import organize_paths
 
 async def main():
     config = load_config()
@@ -10,9 +10,12 @@ async def main():
     remote_name = get_config_value(config, "backup", "remote_name").rstrip("/\\")
     root_dir = get_config_value(config, "backup", "root_dir").rstrip("/\\")
     rclone_args = get_config_value(config, "rclone", "args")
+    concurrent_limit = get_config_value(config, "rclone", "concurrent_limit")  
     organized_backup_paths = organize_paths(backup_paths, remote_name, root_dir)
 
-    _ = await backup(organized_backup_paths, CommandType.COPY, True, rclone_args)
+    backup_task_semaphore = asyncio.Semaphore(concurrent_limit)
+
+    _ = await backup(organized_backup_paths, CommandType.COPY, True, rclone_args, backup_task_semaphore)
 
 if __name__ == "__main__":
     asyncio.run(main())

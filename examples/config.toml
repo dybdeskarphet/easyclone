@@ -10,6 +10,7 @@ args = [
   "--low-level-retries 10",
   "--stats 1s"
 ]
+concurrent_limit = 2
 
 [backup]
 remote_name = "GoogleDrive"
