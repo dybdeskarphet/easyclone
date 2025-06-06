@@ -2,7 +2,7 @@ import asyncio
 from config import load_config
 from enums import CommandType
 from ipc.server import start_status_server
-from rclone import backup
+from rclone.backup import backup
 from utils import organize_paths
 
 async def main():

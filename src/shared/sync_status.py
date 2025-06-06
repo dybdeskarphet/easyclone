@@ -1,5 +1,5 @@
 import asyncio
-from enums import BackupStatus
+from enums import BackupStatus, PathType
 from models import SyncStatusItem
 import uuid
 
@@ -8,7 +8,7 @@ class SyncStatus:
         self.operations: list[SyncStatusItem]  = []
         self.lock: asyncio.Lock = asyncio.Lock()
 
-    async def add_operation(self, source: str, dest: str, status: BackupStatus):
+    async def add_operation(self, source: str, dest: str, path_type: str, status: BackupStatus):
         random_id = str(uuid.uuid4())
 
         async with self.lock:
@@ -16,7 +16,8 @@ class SyncStatus:
                 "id": random_id,
                 "source": source,
                 "dest": dest,
-                "status": status.value
+                "status": status.value,
+                "type": path_type
             })
 
         return random_id

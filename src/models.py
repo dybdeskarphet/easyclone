@@ -18,6 +18,7 @@ class Config(BaseModel):
 class PathItem(TypedDict):
     source: str
     dest: str
+    type: str
 
 class SyncStatusItem(PathItem):
     id: str
