@@ -1,8 +1,8 @@
 import asyncio
 from asyncio.tasks import Task
 import shlex
-from enums import BackupLog, BackupStatus, CommandType, LogLevel
-from models import PathItem
+from types.enums import BackupLog, BackupStatus, CommandType, LogLevel
+from types.models import PathItem
 from utils import collapseuser, log
 from shared.sync_status import sync_status
 

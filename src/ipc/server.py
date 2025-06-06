@@ -1,7 +1,7 @@
 import asyncio
 import json
 from pathlib import Path
-from enums import LogLevel
+from types.enums import LogLevel
 from shared.sync_status import sync_status
 from utils import log
 

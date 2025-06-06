@@ -1,6 +1,6 @@
 import asyncio
-from enums import BackupStatus, PathType
-from models import SyncStatusItem
+from types.enums import BackupStatus
+from types.models import SyncStatusItem
 import uuid
 
 class SyncStatus:

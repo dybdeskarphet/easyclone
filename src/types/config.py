@@ -1,4 +1,3 @@
-from typing import TypedDict
 from pydantic import BaseModel
 
 class BackupConfig(BaseModel):
@@ -14,12 +13,3 @@ class RcloneConfig(BaseModel):
 class Config(BaseModel):
     backup: BackupConfig
     rclone: RcloneConfig
-
-class PathItem(TypedDict):
-    source: str
-    dest: str
-    type: str
-
-class SyncStatusItem(PathItem):
-    id: str
-    status: str

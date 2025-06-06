@@ -1,8 +1,8 @@
 from pathlib import Path
-from enums import BackupLog, LogLevel, PathType
+from types.enums import BackupLog, LogLevel, PathType
 import os
 
-from models import PathItem
+from types.models import PathItem
 
 def log(message: str, logtype: LogLevel | BackupLog) -> None:
     color = "\033[32;1m"
