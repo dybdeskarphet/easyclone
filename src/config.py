@@ -1,7 +1,7 @@
 from os import getenv
 from pathlib import Path
-from types.enums import LogLevel, PathType
-from types.config import Config
+from utypes.enums import LogLevel, PathType
+from utypes.config import Config
 from utils import log
 import toml
 

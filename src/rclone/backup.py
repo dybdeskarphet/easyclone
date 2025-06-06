@@ -1,10 +1,10 @@
 import asyncio
 from asyncio.tasks import Task
 import shlex
-from types.enums import BackupLog, BackupStatus, CommandType, LogLevel
-from types.models import PathItem
+from shared import sync_status
+from utypes.enums import BackupLog, BackupStatus, CommandType, LogLevel
+from utypes.models import PathItem
 from utils import collapseuser, log
-from shared.sync_status import sync_status
 
 async def backup_command(rclone_command: list[str], source: str, dest: str, path_type: str, command_type: CommandType, verbose: bool = False):
     cmd = rclone_command + [source, dest]

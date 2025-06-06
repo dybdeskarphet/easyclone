@@ -1,8 +1,8 @@
 import asyncio
 import json
 from pathlib import Path
-from types.enums import LogLevel
-from shared.sync_status import sync_status
+from shared import sync_status
+from utypes.enums import LogLevel
 from utils import log
 
 SOCKET_PATH = "/tmp/syncgdrive.sock"

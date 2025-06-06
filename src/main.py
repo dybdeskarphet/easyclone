@@ -1,6 +1,6 @@
 import asyncio
 from config import load_config
-from types.enums import CommandType
+from utypes.enums import CommandType
 from ipc.server import start_status_server
 from rclone.backup import backup
 from utils import organize_paths

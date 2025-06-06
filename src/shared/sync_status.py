@@ -1,6 +1,6 @@
 import asyncio
-from types.enums import BackupStatus
-from types.models import SyncStatusItem
+from utypes.enums import BackupStatus
+from utypes.models import SyncStatusItem
 import uuid
 
 class SyncStatus:
@@ -37,4 +37,3 @@ class SyncStatus:
         async with self.lock:
             return len(self.operations)
 
-sync_status = SyncStatus()
