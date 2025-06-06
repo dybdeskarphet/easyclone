@@ -21,7 +21,7 @@ sync_paths = [
   "/etc/motd"
 ]
 
-backup_paths = [
+copy_paths = [
   "~/test_2/1.dat",
   "/etc/motd"
 ]

@@ -1,17 +1,16 @@
 import asyncio
 from asyncio.tasks import Task
 import shlex
-
 from enums import BackupLog, BackupStatus, CommandType, LogLevel
-from ipc.server import start_status_server
 from models import PathItem
 from utils import collapseuser, log
 from shared.sync_status import sync_status
 
-async def backup_command(rclone_command: list[str], source: str, dest: str, verbose: bool = False):
+async def backup_command(rclone_command: list[str], source: str, dest: str, command_type: CommandType, verbose: bool = False):
     cmd = rclone_command + [source, dest]
+    operation_name = command_type.value.capitalize() + "ing"
 
-    log(f"Backing up {collapseuser(source)}", BackupLog.WAIT)
+    log(f"{operation_name} {collapseuser(source)}", BackupLog.WAIT)
     process = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
     process_id = await sync_status.add_operation(source, dest, BackupStatus.IN_PROGRESS)
 
@@ -20,7 +19,6 @@ async def backup_command(rclone_command: list[str], source: str, dest: str, verb
     stderr = stderr.decode(errors="ignore").strip()
 
     collapsed_source = collapseuser(source)
-
     match process.returncode:
         case 0:
             log(f"Backed up successfully: {collapsed_source}", BackupLog.OK)
@@ -38,14 +36,13 @@ async def backup_command(rclone_command: list[str], source: str, dest: str, verb
             log(f"{stdout}", LogLevel.LOG)
 
 async def backup(paths: list[PathItem], command_type: CommandType, rclone_args: list[str], semaphore: asyncio.Semaphore, verbose: bool = False):
-    cmd = ["rclone", command_type.value, ]
+    cmd = ["rclone", command_type.value]
 
     for arg in rclone_args:
         parts = shlex.split(arg)
         cmd += parts
 
     tasks: list[Task[None]] = []
-    _server = await start_status_server()
 
     for path in paths:
         source, dest = path["source"], path["dest"]
@@ -53,7 +50,7 @@ async def backup(paths: list[PathItem], command_type: CommandType, rclone_args: 
         # I have to do this because python doesn't have anon coroutines
         async def backup_task(source: str = source, dest: str = dest):
             async with semaphore:
-                await backup_command(cmd, source, dest, verbose)
+                await backup_command(cmd, source, dest, command_type, verbose)
 
         task = asyncio.create_task(backup_task())
         tasks.append(task)

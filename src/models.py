@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 class BackupConfig(BaseModel):
     sync_paths: list[str]
-    backup_paths: list[str]
+    copy_paths: list[str]
     remote_name: str
     root_dir: str
 

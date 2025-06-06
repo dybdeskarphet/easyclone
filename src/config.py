@@ -46,14 +46,3 @@ def load_config() -> Config:
     except Exception as e:
         log(f"Invalid config: {e}", LogLevel.ERROR)
         exit(1)
-
-def get_config_value(config: Config, *keys: str) -> Any:
-    try:
-        current = config
-        for key in keys:
-            current = getattr(current, key)
-
-        return current
-    except Exception as e:
-        log(f"Error while getting the config value: {e}", LogLevel.ERROR)
-        exit(1)
