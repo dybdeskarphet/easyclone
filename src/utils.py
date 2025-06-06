@@ -2,6 +2,8 @@ from pathlib import Path
 from enums import BackupLog, LogLevel
 import os
 
+from models import PathItem
+
 def log(message: str, logtype: LogLevel | BackupLog) -> None:
     color = "\033[32;1m"
 
@@ -25,8 +27,8 @@ def log(message: str, logtype: LogLevel | BackupLog) -> None:
 
     print(f"{full_msg}\033[0m {message}")
 
-def organize_paths(paths: list[str], remote_name: str, root_dir: str) -> list[dict[str,str]]:
-    source_dest_array: list[dict[str,str]] = []
+def organize_paths(paths: list[str], remote_name: str, root_dir: str) -> list[PathItem]:
+    source_dest_array: list[PathItem] = []
 
     for path in paths:
         p = Path(path).expanduser()

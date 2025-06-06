@@ -15,8 +15,10 @@ class Config(BaseModel):
     backup: BackupConfig
     rclone: RcloneConfig
 
-class SyncStatusItem(TypedDict):
-    id: str
+class PathItem(TypedDict):
     source: str
     dest: str
+
+class SyncStatusItem(PathItem):
+    id: str
     status: str

@@ -15,7 +15,7 @@ async def main():
 
     backup_task_semaphore = asyncio.Semaphore(concurrent_limit)
 
-    _ = await backup(organized_backup_paths, CommandType.COPY, True, rclone_args, backup_task_semaphore)
+    _ = await backup(paths=organized_backup_paths, command_type=CommandType.COPY, rclone_args=rclone_args, semaphore=backup_task_semaphore)
 
 if __name__ == "__main__":
     asyncio.run(main())
