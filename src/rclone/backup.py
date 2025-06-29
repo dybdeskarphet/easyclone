@@ -1,5 +1,4 @@
 import asyncio
-from asyncio.tasks import Task
 import shlex
 from shared import sync_status
 from utypes.enums import BackupLog, BackupStatus, CommandType, LogLevel
@@ -42,17 +41,16 @@ async def backup(paths: list[PathItem], command_type: CommandType, rclone_args: 
         parts = shlex.split(arg)
         cmd += parts
 
-    tasks: list[Task[None]] = []
+    # I have to do this because python doesn't have anon coroutines
+    async def backup_task(source: str, dest: str, path_type: str):
+        async with semaphore:
+            await backup_command(cmd, source, dest, path_type, command_type, verbose)
 
-    for path in paths:
-        source, dest, path_type = path["source"], path["dest"], path["type"]
 
-        # I have to do this because python doesn't have anon coroutines
-        async def backup_task(source: str = source, dest: str = dest, path_type: str=path_type):
-            async with semaphore:
-                await backup_command(cmd, source, dest, path_type, command_type, verbose)
+    tasks = [
+        backup_task(path["source"], path["dest"], path["type"])
+        for path in paths
+    ]
+    
+    return await asyncio.gather(*tasks)
 
-        task = asyncio.create_task(backup_task())
-        tasks.append(task)
-
-    _tasks_result = await asyncio.gather(*tasks)

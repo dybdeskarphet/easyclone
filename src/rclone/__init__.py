@@ -1,2 +1,2 @@
 from .backup import backup
-from .folders import create_folders
+from .dirs import create_dirs_array
