@@ -1,40 +1,36 @@
 import asyncio
-from config import load_config
-from rclone.dirs import create_dir_tree, create_dirs_array, traverse_and_create_folders_by_depth
-from utypes.enums import CommandType
-from rclone.backup import backup
-from utils import organize_paths
+from ipc.client import listen_ipc
+from ipc.server import start_status_server
+from rclone.operations import backup_copy_command, backup_sync_command
+import typer
 
-async def main():
-    config = load_config()
-    root_dir = str((config.backup.root_dir)).rstrip("/")
+app = typer.Typer()
 
-    copy_paths = organize_paths(config.backup.copy_paths, config.backup.remote_name, root_dir)
-    sync_paths = organize_paths(config.backup.sync_paths, config.backup.remote_name, root_dir)
+async def ipc():
+    server = await start_status_server()
+    async with server:
+        await server.serve_forever()
 
+@app.command()
+def start_backup():
+    async def start():
+        task_ipc = asyncio.create_task(ipc())  # runs forever in background
+        task_backup = asyncio.create_task(backup_copy_command())
+        task_sync = asyncio.create_task(backup_sync_command())
 
-    copy_task_semaphore = asyncio.Semaphore(config.rclone.concurrent_limit)
-    sync_task_semaphore = asyncio.Semaphore(config.rclone.concurrent_limit)
+        _ = await asyncio.gather(task_backup, task_sync)
+        _ = task_ipc.cancel()
 
-    copy_dirs_task_semaphore = asyncio.Semaphore(config.rclone.concurrent_limit)
-    sync_dirs_task_semaphore = asyncio.Semaphore(config.rclone.concurrent_limit)
+        try:
+            await task_ipc
+        except asyncio.CancelledError:
+            pass
+        
+    asyncio.run(start())
 
-    copy_dirs_array = create_dirs_array(copy_paths)
-    copy_dirs_root = create_dir_tree(copy_dirs_array)
-
-    sync_dirs_array = create_dirs_array(sync_paths)
-    sync_dirs_root = create_dir_tree(sync_dirs_array)
-
-    print("1")
-    _copy_folders_create_operation = await traverse_and_create_folders_by_depth(copy_dirs_root, False, copy_dirs_task_semaphore)
-    print("2")
-    _sync_folders_create_operation = await traverse_and_create_folders_by_depth(sync_dirs_root, False, sync_dirs_task_semaphore)
-
-    print("3")
-    _copy_operation = await backup(paths=copy_paths, command_type=CommandType.COPY, rclone_args=config.rclone.args, semaphore=copy_task_semaphore)
-    print("4")
-    _sync_operation = await backup(paths=sync_paths, command_type=CommandType.COPY, rclone_args=config.rclone.args, semaphore=sync_task_semaphore)
-
+@app.command()
+def read_ipc():
+    asyncio.run(listen_ipc())
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    app()

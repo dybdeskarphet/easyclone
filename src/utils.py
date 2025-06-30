@@ -36,14 +36,14 @@ def organize_paths(paths: list[str], remote_name: str, root_dir: str) -> list[Pa
             source_dest_array.append({
                 "source": f"{p}",
                 "dest": f"{remote_name}:{root_dir}{p}",
-                "type": PathType.DIR.value
+                "path_type": PathType.DIR.value
             })
         elif p.is_file():
             dest_dir = p.parent
             source_dest_array.append({
                 "source": f"{p}",
                 "dest": f"{remote_name}:{root_dir}{dest_dir}",
-                "type": PathType.FILE.value
+                "path_type": PathType.FILE.value
             })
 
     return source_dest_array

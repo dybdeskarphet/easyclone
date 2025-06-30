@@ -1,5 +1,5 @@
 import asyncio
-from utypes.enums import BackupStatus
+from utypes.enums import BackupStatus, RcloneOperationType
 from utypes.models import SyncStatusItem
 import uuid
 
@@ -8,7 +8,7 @@ class SyncStatus:
         self.operations: list[SyncStatusItem]  = []
         self.lock: asyncio.Lock = asyncio.Lock()
 
-    async def add_operation(self, source: str, dest: str, path_type: str, status: BackupStatus):
+    async def add_operation(self, source: str, dest: str, path_type: str, status: BackupStatus, operation_type: RcloneOperationType):
         random_id = str(uuid.uuid4())
 
         async with self.lock:
@@ -17,7 +17,8 @@ class SyncStatus:
                 "source": source,
                 "dest": dest,
                 "status": status.value,
-                "type": path_type
+                "path_type": path_type,
+                "operation_type": operation_type.value
             })
 
         return random_id

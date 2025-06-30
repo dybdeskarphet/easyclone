@@ -23,3 +23,7 @@ class PathType(Enum):
 class BackupStatus(Enum):
     IN_PROGRESS = "in_progress"
     FINISHED = "finished"
+
+class RcloneOperationType(Enum):
+    BACKUP = "backup"
+    MKDIR = "mkdir"

@@ -1,8 +1,9 @@
 import asyncio
 import json
 from pathlib import Path
-from shared import sync_status
+import time
 from utypes.enums import LogLevel
+from shared import sync_status
 from utils import log
 
 SOCKET_PATH = "/tmp/syncgdrive.sock"
@@ -19,20 +20,31 @@ async def handle_client(_reader: asyncio.StreamReader, writer: asyncio.StreamWri
 
             await writer.drain()
             await asyncio.sleep(0.5)
+    except (ConnectionResetError, BrokenPipeError, asyncio.IncompleteReadError):
+        pass
     except Exception as e:
-        raise e
+        print(f"Unexpected error: {e}")
     finally:
-        writer.close()
-        await writer.wait_closed()
+        try:
+            writer.close()
+            await writer.wait_closed()
+        except BrokenPipeError:
+            # Ignore broken pipe errors on closing
+            pass
 
 async def start_status_server():
     try:
         Path(SOCKET_PATH).unlink()
-    except FileNotFoundError:
+    except FileNotFoundError as e:
         pass
     except Exception as e:
         log(f"Something happened while connecting to the socket for status server: {e}", LogLevel.ERROR)
+        raise
 
-    server = await asyncio.start_unix_server(handle_client, path=SOCKET_PATH)
+    try:
+        server = await asyncio.start_unix_server(handle_client, path=SOCKET_PATH)
+    except Exception as e:
+        log(f"Couldn't create the UNIX server: {e}", LogLevel.ERROR)
+        raise
 
     return server

@@ -8,6 +8,7 @@ dependencies = [
     "anytree>=2.13.0",
     "pydantic>=2.11.5",
     "toml>=0.10.2",
+    "typer>=0.16.0",
 ]
 
 [tool.basedpyright]
