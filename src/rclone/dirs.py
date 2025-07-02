@@ -88,13 +88,25 @@ def create_dir_tree(path_list: list[PathItem]):
             part_name = source_parts[i]
             current = current.add_child(part_name, node_details)
 
-    return root
+    # TODO: It doesn't accept the real root directly, i don't know why, fix this.
+    return root.children[0]
 
 async def create_folder_command(source: str, dest: str, verbose: bool):
-    cmd = ["rclone", "mkdir", dest]
+    lsd_cmd = ["rclone", "lsd", dest]
+    log(f"Checking if directory exist at {dest}", BackupLog.WAIT)
+
+    # BUG: Real root (root.children[0]) can't run commands like this. It gets stuck at process part.
+    process = await asyncio.create_subprocess_exec(*lsd_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+    stdout, stderr = await process.communicate()
+
+    if process.returncode == 0:
+        log(f"Directory exist at {dest}", BackupLog.OK)
+        return
+
+    mkdir_cmd = ["rclone", "mkdir", dest]
 
     log(f"Creating a directory at {dest}", BackupLog.WAIT)
-    process = await asyncio.create_subprocess_exec(*cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
+    process = await asyncio.create_subprocess_exec(*mkdir_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
     process_id = await sync_status.add_operation(source=source, dest=dest, path_type=PathType.DIR.value, status=BackupStatus.IN_PROGRESS, operation_type=RcloneOperationType.MKDIR)
 
     stdout, stderr = await process.communicate()
