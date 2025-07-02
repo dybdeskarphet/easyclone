@@ -5,8 +5,10 @@ import uuid
 
 class SyncStatus:
     def __init__(self):
+        self.total_path_count: int = 0
         self.operations: list[SyncStatusItem]  = []
         self.lock: asyncio.Lock = asyncio.Lock()
+        self.finished_path_count: int = 0
 
     async def add_operation(self, source: str, dest: str, path_type: str, status: BackupStatus, operation_type: RcloneOperationType):
         random_id = str(uuid.uuid4())
@@ -38,3 +40,22 @@ class SyncStatus:
         async with self.lock:
             return len(self.operations)
 
+    async def set_total_path_count(self, count: int):
+        async with self.lock:
+            self.total_path_count = count
+
+    async def reset_total_paths(self):
+        async with self.lock:
+            self.total_path_count = 0
+
+    async def get_total_path(self):
+        async with self.lock:
+            return self.total_path_count
+
+    async def add_currently_finished(self):
+        async with self.lock:
+            self.finished_path_count += 1
+
+    async def get_currently_finished(self):
+        async with self.lock:
+            return self.finished_path_count

@@ -27,6 +27,7 @@ async def backup_command(rclone_command: list[str], source: str, dest: str, path
             log(f"Back up operation failed with {process.returncode} exit code: {collapsed_source}", BackupLog.ERR)
 
     await sync_status.delete_operation(process_id)
+    await sync_status.add_currently_finished()
 
     if verbose:
         if stderr: 

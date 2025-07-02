@@ -1,7 +1,6 @@
 import asyncio
 import json
 from pathlib import Path
-import time
 from utypes.enums import LogLevel
 from shared import sync_status
 from utils import log
@@ -12,6 +11,8 @@ async def handle_client(_reader: asyncio.StreamReader, writer: asyncio.StreamWri
     try:
         while True:
             message = json.dumps({
+                "total_path_count": await sync_status.get_total_path(),
+                "finished_path_count": await sync_status.get_currently_finished(),
                 "operation_count": await sync_status.get_operation_count(),
                 "operations": await sync_status.get_operations()
             }).encode() + b"\n"
@@ -29,7 +30,6 @@ async def handle_client(_reader: asyncio.StreamReader, writer: asyncio.StreamWri
             writer.close()
             await writer.wait_closed()
         except BrokenPipeError:
-            # Ignore broken pipe errors on closing
             pass
 
 async def start_status_server():

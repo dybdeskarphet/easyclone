@@ -20,7 +20,7 @@ async def listen_ipc():
             return
 
         data = json.loads(line.decode())
-        print(json.dumps(data, indent=2))
+        return data
     finally:
         writer.close()
         await writer.wait_closed()
