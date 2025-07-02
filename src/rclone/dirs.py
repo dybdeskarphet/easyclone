@@ -7,12 +7,14 @@ from utypes.enums import BackupLog, BackupStatus, LogLevel, PathType, RcloneOper
 import os
 from pathlib import Path
 from collections import deque
+from config import load_config
 
 class DirNode:
     def __init__(self, name: str, details: PathItem):
         self.name: str = name
         self.details: PathItem = details
         self.children: list[DirNode] = []
+        self.id = id(self)
 
     def find_child(self, name: str) -> "DirNode | None":
         for child in self.children:
@@ -55,7 +57,8 @@ def create_dirs_array(path_list: list[PathItem]):
     return only_dirs
 
 def create_dir_tree(path_list: list[PathItem]):
-    root = DirNode("", {"source": "", "dest": "", "path_type": ""})
+    config = load_config()
+    root = DirNode("Root", {"source": "/", "dest": f"{config.backup.remote_name}:{str(config.backup.root_dir).rstrip("/")}", "path_type": "dir",})
 
     for path_item in path_list:
         source_str = path_item.get("source")
@@ -71,7 +74,7 @@ def create_dir_tree(path_list: list[PathItem]):
     
         current = root
     
-        for i in range(len(source_parts)):
+        for i in range(1, len(source_parts)):
             source_sub_path = str(Path(*source_parts[:i+1]))
 
             if dest_path:
@@ -88,14 +91,12 @@ def create_dir_tree(path_list: list[PathItem]):
             part_name = source_parts[i]
             current = current.add_child(part_name, node_details)
 
-    # TODO: It doesn't accept the real root directly, i don't know why, fix this.
-    return root.children[0]
+    return root
 
 async def create_folder_command(source: str, dest: str, verbose: bool):
     lsd_cmd = ["rclone", "lsd", dest]
     log(f"Checking if directory exist at {dest}", BackupLog.WAIT)
 
-    # BUG: Real root (root.children[0]) can't run commands like this. It gets stuck at process part.
     process = await asyncio.create_subprocess_exec(*lsd_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE)
     stdout, stderr = await process.communicate()
 
