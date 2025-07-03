@@ -19,7 +19,7 @@ async def ipc():
     async with server:
         await server.serve_forever()
 
-@app.command(help="Starts the backup process using the details from the config file.")
+@app.command(help="Starts the backup process using the details in the config file.")
 def start_backup(verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Enables the rclone logging (overrides config).")] = False):
     async def start():
         await sync_status.set_total_path_count(len(cfg.backup.sync_paths) + len(cfg.backup.copy_paths))
@@ -42,6 +42,10 @@ def get_status(
 ):
     data: Any = asyncio.run(listen_ipc())
 
+    if (not show_total and not show_current and not show_operations or all) or (show_total and show_current and show_operations):
+        print(json.dumps(data, indent=2))
+        return
+
     if show_total:
         print(data["total_path_count"])
 
@@ -50,10 +54,6 @@ def get_status(
 
     if show_operations:
         print(json.dumps(data["operations"], indent=2))
-
-    if all:
-        print(json.dumps(data, indent=2))
-
 
 if __name__ == "__main__":
     app()
