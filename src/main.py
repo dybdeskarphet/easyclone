@@ -3,7 +3,7 @@ from typing import Any
 from config import load_config
 from ipc.client import listen_ipc
 from ipc.server import start_status_server
-from rclone.operations import backup_copy_command, backup_sync_command
+from rclone.operations import backup_copy_operation, backup_sync_operation
 import typer
 import json
 
@@ -17,22 +17,19 @@ async def ipc():
         await server.serve_forever()
 
 @app.command()
-def start_backup():
+def start_backup(verbose: bool = False):
     async def start():
         config = load_config()
+
         await sync_status.set_total_path_count(len(config.backup.sync_paths) + len(config.backup.copy_paths))
-        task_ipc = asyncio.create_task(ipc())  # runs forever in background
-        task_backup = asyncio.create_task(backup_copy_command())
-        task_sync = asyncio.create_task(backup_sync_command())
 
-        _ = await asyncio.gather(task_backup, task_sync)
-        _ = task_ipc.cancel()
+        _ipc_task = asyncio.create_task(ipc()) 
 
-        try:
-            await task_ipc
-        except asyncio.CancelledError:
-            pass
-        
+        verbose_state = verbose or config.backup.verbose_log
+
+        await backup_copy_operation(verbose_state)
+        await backup_sync_operation(verbose_state)
+
     asyncio.run(start())
 
 @app.command()
@@ -40,13 +37,13 @@ def get_status(all: bool = False, show_total: bool = False, show_current: bool =
     data: Any = asyncio.run(listen_ipc())
 
     if show_total:
-        print(data.total_paths)
+        print(data["total_path_count"])
 
     if show_current:
-        print(data.operation_count)
+        print(data["operation_count"])
 
     if show_operations:
-        print(json.dumps(data.operations, indent=2))
+        print(json.dumps(data["operations"], indent=2))
 
     if all:
         print(json.dumps(data, indent=2))
