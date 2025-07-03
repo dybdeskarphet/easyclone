@@ -9,8 +9,8 @@ SOCKET_PATH = "/tmp/syncgdrive.sock"
 async def listen_ipc():
     try:
         reader, writer = await asyncio.open_unix_connection(SOCKET_PATH)
-    except (FileNotFoundError, ConnectionRefusedError) as e:
-        log("No tasks are running at the moment", LogLevel.ERROR)
+    except (FileNotFoundError, ConnectionRefusedError):
+        log("No tasks are running at the moment.", LogLevel.ERROR)
         exit(1)
 
     try:
