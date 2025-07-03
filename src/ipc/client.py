@@ -17,7 +17,7 @@ async def listen_ipc():
         line = await reader.readline()
         if not line:
             log("No tasks are running at the moment", LogLevel.ERROR)
-            return
+            exit(1)
 
         data = json.loads(line.decode())
         return data
