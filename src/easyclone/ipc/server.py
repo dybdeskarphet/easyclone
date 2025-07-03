@@ -1,11 +1,11 @@
 import asyncio
 import json
 from pathlib import Path
-from utypes.enums import LogLevel
-from shared import sync_status
-from utils import log
+from easyclone.utypes.enums import LogLevel
+from easyclone.shared import sync_status
+from easyclone.utils.essentials import log
 
-SOCKET_PATH = "/tmp/syncgdrive.sock"
+SOCKET_PATH = "/tmp/easyclone.sock"
 
 async def handle_client(_reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
     try:

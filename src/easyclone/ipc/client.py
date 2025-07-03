@@ -1,10 +1,10 @@
 import asyncio
 import json
 
-from utils import log
-from utypes.enums import LogLevel
+from easyclone.utils.essentials import log
+from easyclone.utypes.enums import LogLevel
 
-SOCKET_PATH = "/tmp/syncgdrive.sock"
+SOCKET_PATH = "/tmp/easyclone.sock"
 
 async def listen_ipc():
     try:

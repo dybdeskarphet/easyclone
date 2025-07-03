@@ -2,14 +2,14 @@ from __future__ import annotations
 from threading import Lock
 from os import getenv
 from pathlib import Path
-from utypes.enums import LogLevel
-from utypes.config import ConfigModel
+from easyclone.utypes.enums import LogLevel
+from easyclone.utypes.config import ConfigModel
 import toml
 
 class Config:
     _instance: Config | None = None
     _lock: Lock = Lock()
-    _path: Path = Path.home() / '.config' / "syncgdrive" / "config.toml"
+    _path: Path = Path.home() / '.config' / "easyclone" / "config.toml"
     _config: ConfigModel | None = None
 
     def __new__(cls):
@@ -26,9 +26,9 @@ class Config:
         xdg_config_home = getenv("XDG_CONFIG_HOME")
     
         if xdg_config_home:
-            config_dir = Path(xdg_config_home) / 'syncgdrive'
+            config_dir = Path(xdg_config_home) / 'easyclone'
         else: 
-            config_dir = Path.home() / '.config' / "syncgdrive"
+            config_dir = Path.home() / '.config' / "easyclone"
     
         config_file = config_dir / "config.toml"
 
@@ -41,7 +41,7 @@ class Config:
         self._path = config_file
 
     def _load_config(self):
-        from utils.essentials import log
+        from easyclone.utils.essentials import log
         self._get_config_path()
 
         try:

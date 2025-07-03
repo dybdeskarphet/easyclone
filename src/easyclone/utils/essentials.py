@@ -1,4 +1,4 @@
-from utypes.enums import LogLevel, BackupLog
+from easyclone.utypes.enums import LogLevel, BackupLog
 
 def log(message: str, logtype: LogLevel | BackupLog) -> None:
     color = "\033[32;1m"

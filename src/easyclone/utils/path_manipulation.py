@@ -1,10 +1,10 @@
 from pathlib import Path
 import os
-from utypes.enums import PathType
-from utypes.models import PathItem
+from easyclone.utypes.enums import PathType
+from easyclone.utypes.models import PathItem
 
 def organize_paths(paths: list[str], remote_name: str) -> list[PathItem]:
-    from config import cfg
+    from easyclone.config import cfg
     source_dest_array: list[PathItem] = []
     root_dir = cfg.backup.root_dir
 

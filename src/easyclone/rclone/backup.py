@@ -1,10 +1,10 @@
 import asyncio
 import shlex
-from shared import sync_status
-from utypes.enums import BackupLog, BackupStatus, CommandType, LogLevel, RcloneOperationType
-from utypes.models import PathItem
-from utils.essentials import log
-from utils.path_manipulation import collapseuser
+from easyclone.shared import sync_status
+from easyclone.utypes.enums import BackupLog, BackupStatus, CommandType, LogLevel, RcloneOperationType
+from easyclone.utypes.models import PathItem
+from easyclone.utils.essentials import log
+from easyclone.utils.path_manipulation import collapseuser
 
 async def backup_command(rclone_command: list[str], source: str, dest: str, path_type: str, command_type: CommandType, verbose: bool = False):
     cmd = rclone_command + [source, dest]

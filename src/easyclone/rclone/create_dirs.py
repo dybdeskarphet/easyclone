@@ -1,13 +1,13 @@
 from __future__ import annotations
 import asyncio
-from shared import sync_status
-from utils.essentials import log
-from utypes.models import PathItem
-from utypes.enums import BackupLog, BackupStatus, LogLevel, PathType, RcloneOperationType
+from easyclone.shared import sync_status
+from easyclone.utils.essentials import log
+from easyclone.utypes.models import PathItem
+from easyclone.utypes.enums import BackupLog, BackupStatus, LogLevel, PathType, RcloneOperationType
 import os
 from pathlib import Path
 from collections import deque
-from config import cfg
+from easyclone.config import cfg
 
 class DirNode:
     def __init__(self, name: str, details: PathItem):

@@ -1,6 +1,6 @@
 import asyncio
-from utypes.enums import BackupStatus, RcloneOperationType
-from utypes.models import SyncStatusItem
+from easyclone.utypes.enums import BackupStatus, RcloneOperationType
+from easyclone.utypes.models import SyncStatusItem
 import uuid
 
 class SyncStatus:

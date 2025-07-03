@@ -1,9 +1,9 @@
 import asyncio
-from config import cfg
-from rclone.backup import backup
-from rclone.create_dirs import create_dir_tree, create_dirs_array, traverse_and_create_folders_by_depth
-from utils.path_manipulation import organize_paths
-from utypes.enums import CommandType
+from easyclone.config import cfg
+from easyclone.rclone.backup import backup
+from easyclone.rclone.create_dirs import create_dir_tree, create_dirs_array, traverse_and_create_folders_by_depth
+from easyclone.utils.path_manipulation import organize_paths
+from easyclone.utypes.enums import CommandType
 
 async def backup_copy_operation(verbose: bool):
     copy_paths = organize_paths(cfg.backup.copy_paths, cfg.backup.remote_name)
