@@ -3,7 +3,8 @@ import shlex
 from shared import sync_status
 from utypes.enums import BackupLog, BackupStatus, CommandType, LogLevel, RcloneOperationType
 from utypes.models import PathItem
-from utils import collapseuser, log
+from utils.essentials import log
+from utils.path_manipulation import collapseuser
 
 async def backup_command(rclone_command: list[str], source: str, dest: str, path_type: str, command_type: CommandType, verbose: bool = False):
     cmd = rclone_command + [source, dest]
@@ -37,6 +38,7 @@ async def backup_command(rclone_command: list[str], source: str, dest: str, path
 
 async def backup(paths: list[PathItem], command_type: CommandType, rclone_args: list[str], semaphore: asyncio.Semaphore, verbose: bool = False):
     cmd = ["rclone", command_type.value]
+
 
     for arg in rclone_args:
         parts = shlex.split(arg)

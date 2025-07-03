@@ -1,6 +1,6 @@
 import asyncio
 from typing import Any
-from config import config
+from config import cfg
 from ipc.client import listen_ipc
 from ipc.server import start_status_server
 from rclone.operations import backup_copy_operation, backup_sync_operation
@@ -19,11 +19,11 @@ async def ipc():
 @app.command()
 def start_backup(verbose: bool = False):
     async def start():
-        await sync_status.set_total_path_count(len(config.backup.sync_paths) + len(config.backup.copy_paths))
+        await sync_status.set_total_path_count(len(cfg.backup.sync_paths) + len(cfg.backup.copy_paths))
 
         _ipc_task = asyncio.create_task(ipc()) 
 
-        verbose_state = verbose or config.backup.verbose_log
+        verbose_state = verbose or cfg.backup.verbose_log
 
         await backup_copy_operation(verbose_state)
         await backup_sync_operation(verbose_state)

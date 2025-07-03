@@ -1,20 +1,19 @@
 from __future__ import annotations
 import asyncio
 from shared import sync_status
-from utils import log
+from utils.essentials import log
 from utypes.models import PathItem
 from utypes.enums import BackupLog, BackupStatus, LogLevel, PathType, RcloneOperationType
 import os
 from pathlib import Path
 from collections import deque
-from config import config
+from config import cfg
 
 class DirNode:
     def __init__(self, name: str, details: PathItem):
         self.name: str = name
         self.details: PathItem = details
         self.children: list[DirNode] = []
-        self.id = id(self)
 
     def find_child(self, name: str) -> "DirNode | None":
         for child in self.children:
@@ -57,7 +56,7 @@ def create_dirs_array(path_list: list[PathItem]):
     return only_dirs
 
 def create_dir_tree(path_list: list[PathItem]):
-    root = DirNode("Root", {"source": "/", "dest": f"{config.backup.remote_name}:{str(config.backup.root_dir).rstrip("/")}", "path_type": "dir",})
+    root = DirNode("Root", {"source": "/", "dest": f"{cfg.backup.remote_name}:{str(cfg.backup.root_dir).rstrip("/")}", "path_type": "dir",})
 
     for path_item in path_list:
         source_str = path_item.get("source")

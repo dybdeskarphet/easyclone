@@ -2,10 +2,8 @@ from __future__ import annotations
 from threading import Lock
 from os import getenv
 from pathlib import Path
-from typing import override
 from utypes.enums import LogLevel
 from utypes.config import ConfigModel
-from utils import log
 import toml
 
 class Config:
@@ -43,6 +41,7 @@ class Config:
         self._path = config_file
 
     def _load_config(self):
+        from utils.essentials import log
         self._get_config_path()
 
         try:
@@ -63,10 +62,9 @@ class Config:
             log(f"Invalid config: {e}", LogLevel.ERROR)
             exit(1)
 
-    @property
     def config(self) -> ConfigModel:
         if self._config is None:
             raise RuntimeError("Config is not loaded yet")
         return self._config
 
-config = Config().config
+cfg = Config().config()
