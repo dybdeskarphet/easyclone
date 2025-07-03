@@ -1,47 +1,72 @@
+from __future__ import annotations
+from threading import Lock
 from os import getenv
 from pathlib import Path
-from utypes.enums import LogLevel, PathType
-from utypes.config import Config
+from typing import override
+from utypes.enums import LogLevel
+from utypes.config import ConfigModel
 from utils import log
 import toml
 
-def get_config(path_type: PathType, create: bool) -> Path:
-    xdg_config_home = getenv("XDG_CONFIG_HOME")
+class Config:
+    _instance: Config | None = None
+    _lock: Lock = Lock()
+    _path: Path = Path.home() / '.config' / "syncgdrive" / "config.toml"
+    _config: ConfigModel | None = None
 
-    if xdg_config_home:
-        config_dir = Path(xdg_config_home) / 'syncgdrive'
-    else: 
-        config_dir = Path.home() / '.config' / "syncgdrive"
+    def __new__(cls):
+        if cls._instance is None:
+            with cls._lock:
+                instance = super().__new__(cls)
+                instance._get_config_path()
+                instance._config = instance._load_config()
+                cls._instance = instance
 
-    config_file = config_dir / "config.toml"
+        return cls._instance
 
-    if create:
-        config_dir.mkdir(parents=True, exist_ok=True)
+    def _get_config_path(self):
+        xdg_config_home = getenv("XDG_CONFIG_HOME")
+    
+        if xdg_config_home:
+            config_dir = Path(xdg_config_home) / 'syncgdrive'
+        else: 
+            config_dir = Path.home() / '.config' / "syncgdrive"
+    
+        config_file = config_dir / "config.toml"
+
+        if not config_dir.exists():
+            config_dir.mkdir(parents=True, exist_ok=True)
+
         if not config_file.exists():
             config_file.touch()
+    
+        self._path = config_file
 
-    if path_type is PathType.FILE:
-        return config_file
-    else:
-        return config_dir
+    def _load_config(self):
+        self._get_config_path()
 
-def load_config() -> Config:
-    config_file = get_config(path_type=PathType.FILE, create=True)
+        try:
+            with open(self._path) as f:
+                parsed_string = f.read()
+        except FileNotFoundError:
+            log(f"Config file not found at {self._path}.", LogLevel.ERROR)
+            exit(1)
+        except Exception as e:
+            log(f"Error while opening the config file {self._path}: {e}", LogLevel.ERROR)
+            exit(1)
 
-    try:
-        with open(config_file) as f:
-            parsed_string = f.read()
-    except FileNotFoundError:
-        log(f"Config file not found at {config_file}.", LogLevel.ERROR)
-        exit(1)
-    except Exception as e:
-        log(f"Error while opening the config file {config_file}: {e}", LogLevel.ERROR)
-        exit(1)
+        try:
+            parsed_toml = toml.loads(parsed_string)
+            validated_config = ConfigModel.model_validate(parsed_toml)
+            return validated_config
+        except Exception as e:
+            log(f"Invalid config: {e}", LogLevel.ERROR)
+            exit(1)
 
-    try:
-        parsed_toml = toml.loads(parsed_string)
-        validated_config = Config.model_validate(parsed_toml)
-        return validated_config
-    except Exception as e:
-        log(f"Invalid config: {e}", LogLevel.ERROR)
-        exit(1)
+    @property
+    def config(self) -> ConfigModel:
+        if self._config is None:
+            raise RuntimeError("Config is not loaded yet")
+        return self._config
+
+config = Config().config

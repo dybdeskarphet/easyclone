@@ -7,7 +7,7 @@ from utypes.enums import BackupLog, BackupStatus, LogLevel, PathType, RcloneOper
 import os
 from pathlib import Path
 from collections import deque
-from config import load_config
+from config import config
 
 class DirNode:
     def __init__(self, name: str, details: PathItem):
@@ -57,7 +57,6 @@ def create_dirs_array(path_list: list[PathItem]):
     return only_dirs
 
 def create_dir_tree(path_list: list[PathItem]):
-    config = load_config()
     root = DirNode("Root", {"source": "/", "dest": f"{config.backup.remote_name}:{str(config.backup.root_dir).rstrip("/")}", "path_type": "dir",})
 
     for path_item in path_list:

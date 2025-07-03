@@ -1,12 +1,11 @@
 import asyncio
-from config import load_config
+from config import config
 from rclone.backup import backup
 from rclone.dirs import create_dir_tree, create_dirs_array, traverse_and_create_folders_by_depth
 from utils import organize_paths
 from utypes.enums import CommandType
 
 async def backup_copy_operation(verbose: bool):
-    config = load_config()
     root_dir = str((config.backup.root_dir)).rstrip("/")
 
     copy_paths = organize_paths(config.backup.copy_paths, config.backup.remote_name, root_dir)
@@ -23,7 +22,6 @@ async def backup_copy_operation(verbose: bool):
 
 
 async def backup_sync_operation(verbose: bool):
-    config = load_config()
     root_dir = str((config.backup.root_dir)).rstrip("/")
 
     sync_paths = organize_paths(config.backup.sync_paths, config.backup.remote_name, root_dir)
