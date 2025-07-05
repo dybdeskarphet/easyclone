@@ -5,15 +5,19 @@ description = "Very convenient Rclone bulk backup wrapper"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "anytree>=2.13.0",
     "pydantic>=2.11.5",
     "toml>=0.10.2",
     "typer>=0.16.0",
 ]
 
+[project.scripts]
+easyclone = "easyclone.main:app"
+
+[project.urls]
+Repository = "https://github.com/dybdeskarphet/easyclone"
+Documentation = "https://github.com/dybdeskarphet/easyclone"
+Issues = "https://github.com/dybdeskarphet/easyclone/issues"
+
 [tool.basedpyright]
 reportAny = false
 reportExplicitAny = false
-
-[project.scripts]
-easyclone = "easyclone.main:app"
