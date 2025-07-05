@@ -36,7 +36,7 @@ It will:
 
 PRs welcome. Bug reports even more welcome.
 
-# ❓ FAQ
+## ❓ FAQ
 
 Why does it create the folders first?
 > Because services like Google Drive support multiple folders with the same name in the same directory. So when you try to concurrently backup paths from the same directory, it will create the parent directory more than once, and we don't want that.
