@@ -3,7 +3,7 @@ from threading import Lock
 from os import getenv
 from pathlib import Path
 from easyclone.utypes.enums import LogLevel
-from easyclone.utypes.config import ConfigModel
+from easyclone.utypes.config import BackupConfigModel, ConfigModel, RcloneConfigModel
 import toml
 
 class Config:
@@ -24,6 +24,30 @@ class Config:
 
     def _get_config_path(self):
         xdg_config_home = getenv("XDG_CONFIG_HOME")
+
+        empty_config = ConfigModel(
+            backup=BackupConfigModel(
+                sync_paths=[],
+                copy_paths=[],
+                remote_name="GoogleDrive",
+                root_dir="Backups/PC",
+                verbose_log=False
+            ),
+            rclone=RcloneConfigModel(
+                args=[
+                    "--update",
+                    "--verbose",
+                    "--transfers 30",
+                    "--checkers 8",
+                    "--contimeout 60s",
+                    "--timeout 300s",
+                    "--retries 3",
+                    "--low-level-retries 10",
+                    "--stats 1s"
+                ],
+                concurrent_limit=50
+            )
+        )
     
         if xdg_config_home:
             config_dir = Path(xdg_config_home) / 'easyclone'
@@ -37,12 +61,15 @@ class Config:
 
         if not config_file.exists():
             config_file.touch()
+            with open(config_file, "w") as f:
+                _ = toml.dump(empty_config.model_dump(), f)
     
         self._path = config_file
 
     def _load_config(self):
         from easyclone.utils.essentials import log
         self._get_config_path()
+
 
         try:
             with open(self._path) as f:
