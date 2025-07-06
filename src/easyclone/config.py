@@ -70,7 +70,6 @@ class Config:
         from easyclone.utils.essentials import log
         self._get_config_path()
 
-
         try:
             with open(self._path) as f:
                 parsed_string = f.read()
@@ -84,6 +83,10 @@ class Config:
         try:
             parsed_toml = toml.loads(parsed_string)
             validated_config = ConfigModel.model_validate(parsed_toml)
+
+            # Normalize config
+            validated_config.backup.root_dir = validated_config.backup.root_dir.strip("/")
+
             return validated_config
         except Exception as e:
             log(f"Invalid config: {e}", LogLevel.ERROR)

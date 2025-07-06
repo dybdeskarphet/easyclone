@@ -56,7 +56,7 @@ def create_dirs_array(path_list: list[PathItem]):
     return only_dirs
 
 def create_dir_tree(path_list: list[PathItem]):
-    root = DirNode("Root", {"source": "/", "dest": f"{cfg.backup.remote_name}:{str(cfg.backup.root_dir).rstrip("/")}", "path_type": "dir",})
+    root = DirNode("Root", {"source": "/", "dest": f"{cfg.backup.remote_name}:{cfg.backup.root_dir}", "path_type": "dir",})
 
     for path_item in path_list:
         source_str = path_item.get("source")
