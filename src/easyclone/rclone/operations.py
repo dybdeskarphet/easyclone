@@ -5,7 +5,7 @@ from easyclone.rclone.create_dirs import create_dir_tree, create_dirs_array, tra
 from easyclone.utils.path_manipulation import organize_paths
 from easyclone.utypes.enums import CommandType
 
-def make_backup_operation(paths_config: list[str], verbose: bool):
+def make_backup_operation(command_type: CommandType, paths_config: list[str], verbose: bool):
     async def backup_operation():
         paths = organize_paths(paths_config, cfg.backup.remote_name)
         task_semaphore = asyncio.Semaphore(cfg.rclone.concurrent_limit)
@@ -20,7 +20,7 @@ def make_backup_operation(paths_config: list[str], verbose: bool):
         )
         _copy_operation = await backup(
             paths=paths,
-            command_type=CommandType.COPY,
+            command_type=command_type,
             rclone_args=cfg.rclone.args,
             semaphore=task_semaphore,
             verbose=verbose

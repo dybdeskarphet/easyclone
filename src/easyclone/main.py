@@ -8,6 +8,7 @@ import typer
 import json
 from easyclone.shared import sync_status
 from easyclone.utils.essentials import exit_if_currently_running, exit_if_no_rclone
+from easyclone.utypes.enums import CommandType
 
 app = typer.Typer(
     help="Very convenient Rclone bulk backup wrapper",
@@ -30,8 +31,8 @@ def start_backup(verbose: Annotated[bool, typer.Option("--verbose", "-v", help="
 
         verbose_state = verbose or cfg.backup.verbose_log
 
-        await make_backup_operation(cfg.backup.copy_paths, verbose_state)()
-        await make_backup_operation(cfg.backup.sync_paths, verbose_state)()
+        await make_backup_operation(CommandType.COPY, cfg.backup.copy_paths, verbose_state)()
+        await make_backup_operation(CommandType.SYNC, cfg.backup.sync_paths, verbose_state)()
 
     asyncio.run(start())
 
