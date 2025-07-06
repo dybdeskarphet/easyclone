@@ -12,6 +12,15 @@ You define what to back up, where to back it up, and EasyClone handles the syncs
 * 🛠️ IPC-ready architecture for future GUI or monitoring tools
 * 🔊 Optional verbose logging
 
+## Installation
+
+Install it with `pip` or `pipx`:
+
+```bash
+pip install easyclone
+pipx install easyclone
+```
+
 ## 🛠️ Requirements
 
 * Python **3.13+**
