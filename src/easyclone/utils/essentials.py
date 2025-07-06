@@ -1,3 +1,4 @@
+import os
 from easyclone.utypes.enums import LogLevel, BackupLog
 
 def log(message: str, logtype: LogLevel | BackupLog) -> None:
@@ -30,4 +31,9 @@ def is_tool(name: str):
 def exit_if_no_rclone():
     if not is_tool("rclone"):
         log("Rclone is not installed on your system, 'rclone' command should be in the $PATH.", LogLevel.ERROR)
+        exit(1)
+
+def exit_if_currently_running():
+    if os.path.exists('/tmp/easyclone.sock'):
+        log("Easyclone is already running. Delete /tmp/easyclone.sock if you think this is a mistake.", LogLevel.WARN)
         exit(1)
