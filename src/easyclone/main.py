@@ -3,7 +3,7 @@ from typing import Annotated, Any
 from easyclone.config import cfg
 from easyclone.ipc.client import listen_ipc
 from easyclone.ipc.server import start_status_server
-from easyclone.rclone.operations import backup_copy_operation, backup_sync_operation
+from easyclone.rclone.operations import make_backup_operation
 import typer
 import json
 from easyclone.shared import sync_status
@@ -29,8 +29,11 @@ def start_backup(verbose: Annotated[bool, typer.Option("--verbose", "-v", help="
 
         verbose_state = verbose or cfg.backup.verbose_log
 
-        await backup_copy_operation(verbose_state)
-        await backup_sync_operation(verbose_state)
+        backup_copy_operation = make_backup_operation(cfg.backup.copy_paths, verbose_state)
+        backup_sync_operation = make_backup_operation(cfg.backup.sync_paths, verbose_state)
+
+        await backup_copy_operation()
+        await backup_sync_operation()
 
     asyncio.run(start())
 
