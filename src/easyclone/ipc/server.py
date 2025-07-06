@@ -13,6 +13,7 @@ async def handle_client(_reader: asyncio.StreamReader, writer: asyncio.StreamWri
             message = json.dumps({
                 "total_path_count": await sync_status.get_total_path(),
                 "finished_path_count": await sync_status.get_currently_finished(),
+                "empty_paths": await sync_status.get_empty_paths(),
                 "operation_count": await sync_status.get_operation_count(),
                 "operations": await sync_status.get_operations()
             }).encode() + b"\n"

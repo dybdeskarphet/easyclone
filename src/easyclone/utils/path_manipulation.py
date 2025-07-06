@@ -1,15 +1,19 @@
 from pathlib import Path
 import os
 from easyclone.utypes.enums import PathType
-from easyclone.utypes.models import PathItem
+from easyclone.utypes.models import OrganizedPaths, PathItem
 
-def organize_paths(paths: list[str], remote_name: str) -> list[PathItem]:
+def organize_paths(paths: list[str], remote_name: str) -> OrganizedPaths:
     from easyclone.config import cfg
     source_dest_array: list[PathItem] = []
+    empty_paths: list[str] = []
     root_dir = cfg.backup.root_dir
 
     for path in paths:
         p = Path(path).expanduser()
+
+        if not os.path.exists(p):
+            empty_paths.append(path)
 
         if p.is_dir():
             source_dest_array.append({
@@ -25,7 +29,10 @@ def organize_paths(paths: list[str], remote_name: str) -> list[PathItem]:
                 "path_type": PathType.FILE.value
             })
 
-    return source_dest_array
+    return { 
+        "valid_paths": source_dest_array,
+        "empty_paths": empty_paths
+    }
 
 def collapseuser(path: str) -> str:
     """

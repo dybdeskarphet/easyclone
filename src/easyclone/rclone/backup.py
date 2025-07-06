@@ -39,7 +39,6 @@ async def backup_command(rclone_command: list[str], source: str, dest: str, path
 async def backup(paths: list[PathItem], command_type: CommandType, rclone_args: list[str], semaphore: asyncio.Semaphore, verbose: bool = False):
     cmd = ["rclone", command_type.value]
 
-
     for arg in rclone_args:
         parts = shlex.split(arg)
         cmd += parts

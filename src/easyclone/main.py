@@ -41,11 +41,13 @@ def get_status(
         all: Annotated[bool, typer.Option("--all", "-a", help="Show all the backup status information.")] = False,
         show_total: Annotated[bool, typer.Option("--show-total", "-t", help="Show the total amount of paths.")] = False,
         show_current: Annotated[bool, typer.Option("--show-current", "-c", help="Show the total amount of pending paths.")] = False,
-        show_operations: Annotated[bool, typer.Option("--show-operations", "-o", help="Show currently running operations.")] = False
+        show_operations: Annotated[bool, typer.Option("--show-operations", "-o", help="Show currently running operations.")] = False,
+        show_operation_count: Annotated[bool, typer.Option("--get-operation-count", "-O", help="Show the total amount of running operations.")] = False,
+        show_empty_paths: Annotated[bool, typer.Option("--show-empty-paths", "-e", help="Show all the empty paths.")] = False
 ):
     data: Any = asyncio.run(listen_ipc())
 
-    if (not show_total and not show_current and not show_operations or all) or (show_total and show_current and show_operations):
+    if (not show_total and not show_current and not show_operations and not show_operation_count and not show_empty_paths or all) or (show_total and show_current and show_operations and show_operation_count and show_empty_paths):
         print(json.dumps(data, indent=2))
         return
 
@@ -57,6 +59,12 @@ def get_status(
 
     if show_operations:
         print(json.dumps(data["operations"], indent=2))
+
+    if show_operation_count:
+        print(json.dumps(data["operation_count"], indent=2))
+
+    if show_empty_paths:
+        print(json.dumps(data["empty_paths"], indent=2))
 
 if __name__ == "__main__":
     app()
