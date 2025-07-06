@@ -22,3 +22,12 @@ def log(message: str, logtype: LogLevel | BackupLog) -> None:
         full_msg = full_msg + ":"
 
     print(f"{full_msg}\033[0m {message}")
+
+def is_tool(name: str):
+    from shutil import which
+    return which(name) is not None
+
+def exit_if_no_rclone():
+    if not is_tool("rclone"):
+        log("Rclone is not installed on your system, 'rclone' command should be in the $PATH.", LogLevel.ERROR)
+        exit(1)

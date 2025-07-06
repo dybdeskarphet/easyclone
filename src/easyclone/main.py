@@ -6,8 +6,8 @@ from easyclone.ipc.server import start_status_server
 from easyclone.rclone.operations import backup_copy_operation, backup_sync_operation
 import typer
 import json
-
 from easyclone.shared import sync_status
+from easyclone.utils.essentials import exit_if_no_rclone
 
 app = typer.Typer(
     help="Very convenient Rclone bulk backup wrapper",
@@ -22,6 +22,7 @@ async def ipc():
 @app.command(help="Starts the backup process using the details in the config file.")
 def start_backup(verbose: Annotated[bool, typer.Option("--verbose", "-v", help="Enables the rclone logging (overrides config).")] = False):
     async def start():
+        exit_if_no_rclone() 
         await sync_status.set_total_path_count(len(cfg.backup.sync_paths) + len(cfg.backup.copy_paths))
 
         _ipc_task = asyncio.create_task(ipc()) 
