@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import os
 from easyclone.utypes.enums import PathType
@@ -10,7 +11,7 @@ def organize_paths(paths: list[str], remote_name: str) -> OrganizedPaths:
     root_dir = cfg.backup.root_dir
 
     for path in paths:
-        p = Path(path).expanduser()
+        p = Path(os.path.expandvars(os.path.expanduser(path)))
 
         if not os.path.exists(p):
             empty_paths.append(path)
@@ -28,7 +29,7 @@ def organize_paths(paths: list[str], remote_name: str) -> OrganizedPaths:
                 "dest": f"{remote_name}:{root_dir}{dest_dir}",
                 "path_type": PathType.FILE.value
             })
-
+    
     return { 
         "valid_paths": source_dest_array,
         "empty_paths": empty_paths
