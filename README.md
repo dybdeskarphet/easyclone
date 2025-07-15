@@ -4,13 +4,13 @@
 
 You define what to back up, where to back it up, and EasyClone handles the syncs and copies — clean, fast, and reliable.
 
-## 🚀 Features
+## Features
 
-* 🔁 Sync & Copy support per-path
-* 📁 Backup multiple paths at once
-* 🧠 Human-friendly TOML config
-* 🛠️ IPC-ready architecture for future GUI or monitoring tools
-* 🔊 Optional verbose logging
+* Sync & Copy support per-path
+* Backup multiple paths at once
+* Human-friendly TOML config
+* IPC-ready architecture for future GUI or monitoring tools
+* Optional verbose logging
 
 ## Installation
 
@@ -21,7 +21,11 @@ pip install easyclone
 pipx install easyclone
 ```
 
-## 🛠️ Requirements
+## Configuration
+
+The config file is at `~/.config/easyclone/config.toml` 
+
+## Requirements
 
 * Python **3.13+**
 * [`rclone`](https://rclone.org/) installed and accessible in your `$PATH`
@@ -29,7 +33,7 @@ pipx install easyclone
 * `toml>=0.10.2`
 * `typer>=0.16.0`
 
-## 🧪 Example Usage
+## Example Usage
 
 ```bash
 easyclone start-backup
@@ -41,16 +45,16 @@ It will:
 * Copy the paths in `copy_paths`
 * Use the `remote_name` and `root_dir` to target your cloud storage
 
-## 🙋‍♀️ Contributing
+## Contributing
 
 PRs welcome. Bug reports even more welcome.
 
-## ❓ FAQ
+## FAQ
 
 Why does it create the folders first?
 > Because services like Google Drive support multiple folders with the same name in the same directory. So when you try to concurrently backup paths from the same directory, it will create the parent directory more than once, and we don't want that.
 
-## 📄 License
+## License
 
 GPLv3 — do whatever you want, just don't blame me if you sync your `/` folder to the cloud :)
 
