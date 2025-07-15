@@ -16,6 +16,7 @@ concurrent_limit = 2
 remote_name = "GoogleDrive"
 root_dir = "Backups/My PC/"
 sync_paths = [
+  "$XDG_CONFIG_HOME",
   "~/test/test_dir",
   "~/test/test_file",
   "/etc/motd"
