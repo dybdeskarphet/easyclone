@@ -1,9 +1,10 @@
 from __future__ import annotations
+import json
 from threading import Lock
 from os import getenv
 from pathlib import Path
 from easyclone.utypes.enums import LogLevel
-from easyclone.utypes.config import BackupConfigModel, ConfigModel, RcloneConfigModel
+from easyclone.utypes.config import BackupConfigModel, ConfigModel
 import toml
 
 class Config:
@@ -31,21 +32,6 @@ class Config:
                 copy_paths=[],
                 remote_name="GoogleDrive",
                 root_dir="Backups/PC",
-                verbose_log=False
-            ),
-            rclone=RcloneConfigModel(
-                args=[
-                    "--update",
-                    "--verbose",
-                    "--transfers 30",
-                    "--checkers 8",
-                    "--contimeout 60s",
-                    "--timeout 300s",
-                    "--retries 3",
-                    "--low-level-retries 10",
-                    "--stats 1s"
-                ],
-                concurrent_limit=50
             )
         )
     
@@ -66,6 +52,10 @@ class Config:
     
         self._path = config_file
 
+    def _config_normalize(self, config: ConfigModel):
+        config.backup.root_dir = config.backup.root_dir.strip("/")
+        return config
+
     def _load_config(self):
         from easyclone.utils.essentials import log
         self._get_config_path()
@@ -83,10 +73,7 @@ class Config:
         try:
             parsed_toml = toml.loads(parsed_string)
             validated_config = ConfigModel.model_validate(parsed_toml)
-
-            # Normalize config
-            validated_config.backup.root_dir = validated_config.backup.root_dir.strip("/")
-
+            validated_config = self._config_normalize(validated_config)
             return validated_config
         except Exception as e:
             log(f"Invalid config: {e}", LogLevel.ERROR)
