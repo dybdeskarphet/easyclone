@@ -1,37 +1,16 @@
 import asyncio
-import atexit
-from os import path, remove
-import signal
 import sys
-from types import FrameType
 from typing import Annotated, Any
 from easyclone.config import cfg
-from easyclone.ipc.client import SOCKET_PATH, listen_ipc
+from easyclone.ipc.client import listen_ipc
 from easyclone.ipc.server import start_status_server
 from easyclone.rclone.operations import make_backup_operation
 import typer
 import json
 from easyclone.shared import sync_status
-from easyclone.utils.essentials import exit_if_currently_running, exit_if_no_rclone, log
-from easyclone.utypes.enums import CommandType, LogLevel
+from easyclone.utils.essentials import exit_if_currently_running, exit_if_no_rclone
+from easyclone.utypes.enums import CommandType
 
-
-def cleanup():
-    if path.exists(SOCKET_PATH):
-        log("Cleaning up socket file...", LogLevel.WARN)
-        remove(SOCKET_PATH)
-
-
-_ = atexit.register(cleanup)
-
-
-def handle_signal(_signum: int, _frame: FrameType | None):
-    cleanup()
-    sys.exit(0)
-
-
-_ = signal.signal(signal.SIGINT, handle_signal)
-_ = signal.signal(signal.SIGTERM, handle_signal)
 
 app = typer.Typer(
     help="Very convenient Rclone bulk backup wrapper",
@@ -54,7 +33,31 @@ def start_backup(
         ),
     ] = False,
 ):
+
+    import atexit
+    from os import path, remove
+    import signal
+    from types import FrameType
+    from easyclone.ipc.client import SOCKET_PATH
+    from easyclone.utils.essentials import log
+    from easyclone.utypes.enums import LogLevel
+
+    def cleanup():
+        if path.exists(SOCKET_PATH):
+            log("Cleaning up socket file...", LogLevel.WARN)
+            remove(SOCKET_PATH)
+
+    _ = atexit.register(cleanup)
+
+    def handle_signal(_signum: int, _frame: FrameType | None):
+        cleanup()
+        sys.exit(0)
+
+    _ = signal.signal(signal.SIGINT, handle_signal)
+    _ = signal.signal(signal.SIGTERM, handle_signal)
+
     async def start():
+
         exit_if_no_rclone()
         exit_if_currently_running()
         await sync_status.set_total_path_count(
