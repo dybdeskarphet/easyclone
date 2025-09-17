@@ -25,6 +25,7 @@ easyclone = "easyclone.main:app"
 Repository = "https://github.com/dybdeskarphet/easyclone"
 Documentation = "https://github.com/dybdeskarphet/easyclone"
 Issues = "https://github.com/dybdeskarphet/easyclone/issues"
+Changelog = "https://github.com/dybdeskarphet/easyclone/blob/main/CHANGELOG.md"
 
 [tool.basedpyright]
 reportAny = false
