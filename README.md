@@ -1,5 +1,7 @@
 # ☁️ easyclone
 
+[![Pepy Total Downloads](https://img.shields.io/pepy/dt/easyclone)](https://pypi.org/project/easyclone/) [![PyPI - Version](https://img.shields.io/pypi/v/easyclone)](https://pypi.org/project/easyclone/) [![PyPI - License](https://img.shields.io/pypi/l/easyclone)](https://pypi.org/project/easyclone/)
+
 **easyclone** is a lightweight, configurable CLI tool that wraps `rclone` to behave more like Google's *Backup and Sync* app.
 
 You define what to back up, where to back it up, and EasyClone handles the syncs and copies — clean, fast, and reliable.
