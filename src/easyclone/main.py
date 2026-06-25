@@ -5,12 +5,12 @@ from easyclone.config import cfg
 from easyclone.ipc.client import listen_ipc
 from easyclone.ipc.server import start_status_server
 from easyclone.rclone.operations import make_backup_operation
+from easyclone.utils.path import collapseuser, find_missing
 import typer
 import json
 from easyclone.shared import sync_status
 from easyclone.utils.essentials import exit_if_currently_running, exit_if_no_rclone
-from easyclone.utypes.enums import CommandType
-
+from easyclone.utypes.enums import CommandType, FindMissingOptions
 
 app = typer.Typer(
     help="Very convenient Rclone bulk backup wrapper",
@@ -76,6 +76,29 @@ def start_backup(
         )()
 
     asyncio.run(start())
+
+
+@app.command(
+    help="Lists the directories and files that are not getting synced or backed up"
+)
+def get_missing(
+    recursive: Annotated[
+        bool, typer.Option("--recursive", "-r", help="Recurse into directories")
+    ] = False,
+    list: Annotated[
+        FindMissingOptions,
+        typer.Option("--list", "-l", help="Select the list you want to filter from"),
+    ] = FindMissingOptions.all,
+    want_json: Annotated[
+        bool, typer.Option("--json", "-j", help="Show the output in JSON format")
+    ] = False,
+):
+    missing = find_missing(recursive=recursive, list_type=list)
+
+    if want_json:
+        print(json.dumps(missing, indent=2))
+    else:
+        [print(collapseuser(p)) for p in missing]
 
 
 @app.command(help="Gets status information about the backup process.")
