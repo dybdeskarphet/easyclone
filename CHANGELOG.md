@@ -1,5 +1,10 @@
 ## [unreleased]
 
+### 📚 Documentation
+
+- *(changelog)* Update CHANGELOG
+## [1.1.0] - 2026-06-25
+
 ### 🚀 Features
 
 - Add the get-missing command for checking missing files and dirs
