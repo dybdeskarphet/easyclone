@@ -1,22 +1,18 @@
 [project]
 name = "easyclone"
-version = "1.0.0"
+version = "1.1.0"
 description = "Very convenient Rclone bulk backup wrapper"
 keywords = ["backup", "sync", "google", "drive", "easyclone"]
 authors = [
-  {name = "Ahmet Arda Kavakcı", email = "ahmetardakavakci@gmail.com"},
+  { name = "Ahmet Arda Kavakcı", email = "ahmetardakavakci@gmail.com" },
 ]
 maintainers = [
-  {name = "Ahmet Arda Kavakcı", email = "ahmetardakavakci@gmail.com"},
+  { name = "Ahmet Arda Kavakcı", email = "ahmetardakavakci@gmail.com" },
 ]
 readme = "README.md"
 license = "GPL-3.0-or-later"
 requires-python = ">=3.13"
-dependencies = [
-    "pydantic>=2.11.5",
-    "toml>=0.10.2",
-    "typer>=0.16.0",
-]
+dependencies = ["pydantic>=2.11.5", "toml>=0.10.2", "typer>=0.16.0"]
 
 [project.scripts]
 easyclone = "easyclone.main:app"
