@@ -9,6 +9,7 @@
 - *(CHANGELOG)* Add CHANGELOG with git-cliff
 - *(pyproject)* Add changelog link to pyproject.toml
 - *(README)* Add shields
+- *(changelog)* Update CHANGELOG
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -16,6 +17,7 @@
 - *(cliff)* Add auto CHANGELOG updater
 - *(release)* Add auto release creator
 - *(pypi)* Add auto pypi publisher
+- *(release)* Bump version
 ## [1.0.0] - 2025-09-17
 
 ### 🚀 Features
