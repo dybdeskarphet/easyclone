@@ -1,5 +1,10 @@
 ## [unreleased]
 
+### 💼 Other
+
+- *(changelog)* Update CHANGELOG
+## [1.1.1] - 2026-06-30
+
 ### 🐛 Bug Fixes
 
 - *(operations)* Show empty paths log when there are empty paths
