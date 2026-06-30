@@ -8,6 +8,11 @@
 
 - *(changelog)* Update CHANGELOG
 - *(changelog)* Update CHANGELOG
+- *(changelog)* Update CHANGELOG
+
+### ⚙️ Miscellaneous Tasks
+
+- *(release)* Bump version
 ## [1.1.0] - 2026-06-25
 
 ### 🚀 Features
