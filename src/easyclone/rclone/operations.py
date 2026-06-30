@@ -22,12 +22,13 @@ def make_backup_operation(
         dirs_array = create_dirs_array(paths["valid_paths"])
         dirs_root = create_dir_tree(dirs_array)
 
-        log(
-            f"Below paths couldn't be found:\n{"\n".join(paths["empty_paths"])}\n",
-            LogLevel.WARN,
-        )
-        for path in paths["empty_paths"]:
-            await sync_status.add_empty_path(path)
+        if paths["empty_paths"]:
+            log(
+                f"Below paths couldn't be found:\n{'\n'.join(paths['empty_paths'])}\n",
+                LogLevel.WARN,
+            )
+            for path in paths["empty_paths"]:
+                await sync_status.add_empty_path(path)
 
         _copy_folders_create_operation = await traverse_and_create_folders_by_depth(
             root=dirs_root, verbose=verbose, semaphore=dirs_task_semaphore
