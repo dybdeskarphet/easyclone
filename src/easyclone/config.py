@@ -4,7 +4,7 @@ from threading import Lock
 from os import getenv
 from pathlib import Path
 from easyclone.utypes.enums import LogLevel
-from easyclone.utypes.config import BackupConfigModel, ConfigModel
+from easyclone.utypes.config import BackupConfigModel, ConfigModel, DaemonConfigModel
 import toml
 
 
@@ -33,6 +33,10 @@ class Config:
                 copy_paths=[],
                 remote_name="GoogleDrive",
                 root_dir="Backups/PC",
+            ),
+            daemon=DaemonConfigModel(
+                interval=60,
+                countdown=False,
             )
         )
 

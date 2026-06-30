@@ -24,6 +24,12 @@ class RcloneConfigModel(BaseModel):
     concurrent_limit: int = 50
 
 
+class DaemonConfigModel(BaseModel):
+    interval: int = 60
+    countdown: bool = False
+
+
 class ConfigModel(BaseModel):
     backup: BackupConfigModel
     rclone: RcloneConfigModel = RcloneConfigModel()
+    daemon: DaemonConfigModel = DaemonConfigModel()

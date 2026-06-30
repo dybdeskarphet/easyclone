@@ -59,6 +59,13 @@ class SyncStatus:
         async with self.lock:
             self.total_path_count = 0
 
+    async def reset_all(self):
+        async with self.lock:
+            self.total_path_count = 0
+            self.operations = []
+            self.finished_path_count = 0
+            self.empty_paths = []
+
     async def get_total_path(self):
         async with self.lock:
             return self.total_path_count

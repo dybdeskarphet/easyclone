@@ -24,16 +24,21 @@ async def ipc():
         await server.serve_forever()
 
 
-@app.command(help="Starts the backup process using the details in the config file.")
-def start_backup(
-    verbose: Annotated[
-        bool,
-        typer.Option(
-            "--verbose", "-v", help="Enables the rclone logging (overrides config)."
-        ),
-    ] = False,
-):
+async def _run_backup_operations(verbose_state: bool):
+    await sync_status.reset_all()
+    await sync_status.set_total_path_count(
+        len(cfg.backup.sync_paths) + len(cfg.backup.copy_paths)
+    )
 
+    await make_backup_operation(
+        CommandType.COPY, cfg.backup.copy_paths, verbose_state
+    )()
+    await make_backup_operation(
+        CommandType.SYNC, cfg.backup.sync_paths, verbose_state
+    )()
+
+
+def _setup_environment():
     import atexit
     from os import path, remove
     import signal
@@ -56,24 +61,74 @@ def start_backup(
     _ = signal.signal(signal.SIGINT, handle_signal)
     _ = signal.signal(signal.SIGTERM, handle_signal)
 
+
+@app.command(help="Starts the backup process using the details in the config file.")
+def start_backup(
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose", "-v", help="Enables the rclone logging (overrides config)."
+        ),
+    ] = False,
+):
+    _setup_environment()
+
     async def start():
+        exit_if_no_rclone()
+        exit_if_currently_running()
+
+        _ipc_task = asyncio.create_task(ipc())
+
+        verbose_state = verbose or cfg.backup.verbose_log
+        await _run_backup_operations(verbose_state)
+
+    asyncio.run(start())
+
+
+@app.command(help="Starts the backup process as a daemon that runs periodically.")
+def daemon(
+    verbose: Annotated[
+        bool,
+        typer.Option(
+            "--verbose", "-v", help="Enables the rclone logging (overrides config)."
+        ),
+    ] = False,
+):
+    _setup_environment()
+
+    async def start():
+        from easyclone.utils.essentials import log
+        from easyclone.utypes.enums import LogLevel
 
         exit_if_no_rclone()
         exit_if_currently_running()
-        await sync_status.set_total_path_count(
-            len(cfg.backup.sync_paths) + len(cfg.backup.copy_paths)
-        )
 
         _ipc_task = asyncio.create_task(ipc())
 
         verbose_state = verbose or cfg.backup.verbose_log
 
-        await make_backup_operation(
-            CommandType.COPY, cfg.backup.copy_paths, verbose_state
-        )()
-        await make_backup_operation(
-            CommandType.SYNC, cfg.backup.sync_paths, verbose_state
-        )()
+        interval_minutes = cfg.daemon.interval
+        interval_seconds = interval_minutes * 60
+        countdown = cfg.daemon.countdown
+
+        while True:
+            await _run_backup_operations(verbose_state)
+
+            if countdown:
+                for remaining in range(interval_seconds, 0, -1):
+                    sys.stdout.write(
+                        f"\rWaiting for the next backup for {remaining // 60}m {remaining % 60}s... "
+                    )
+                    sys.stdout.flush()
+                    await asyncio.sleep(1)
+                sys.stdout.write("\r" + " " * 80 + "\r")
+                sys.stdout.flush()
+            else:
+                log(
+                    f"Waiting for the next backup for {interval_minutes} minutes...",
+                    LogLevel.LOG,
+                )
+                await asyncio.sleep(interval_seconds)
 
     asyncio.run(start())
 
