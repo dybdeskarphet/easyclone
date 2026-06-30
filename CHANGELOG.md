@@ -4,8 +4,9 @@
 
 - *(operations)* Show empty paths log when there are empty paths
 
-### 📚 Documentation
+### 💼 Other
 
+- *(changelog)* Update CHANGELOG
 - *(changelog)* Update CHANGELOG
 - *(changelog)* Update CHANGELOG
 - *(changelog)* Update CHANGELOG
@@ -13,13 +14,14 @@
 ### ⚙️ Miscellaneous Tasks
 
 - *(release)* Bump version
+- *(cliff)* Exclude documentation commits
 ## [1.1.0] - 2026-06-25
 
 ### 🚀 Features
 
 - Add the get-missing command for checking missing files and dirs
 
-### 📚 Documentation
+### 💼 Other
 
 - *(CHANGELOG)* Add CHANGELOG with git-cliff
 - *(pyproject)* Add changelog link to pyproject.toml
@@ -46,11 +48,8 @@
 
 ### 💼 Other
 
-- Bump version
-
-### 📚 Documentation
-
 - *(examples)* Update the example config
+- Bump version
 ## [0.3.0] - 2025-07-15
 
 ### 🚀 Features
@@ -62,9 +61,6 @@
 
 - Bump version
 - Bump version
-
-### 📚 Documentation
-
 - *(README)* Update README
 ## [0.2.0] - 2025-07-06
 
@@ -106,6 +102,14 @@
 - *(ipc.client)* Exit with 1 if no tasks are running
 - *(main)* Make get-status show the entire JSON if all the flags are passed
 
+### 💼 Other
+
+- *(README)* Add warning
+- Create a to-do for fixing multiple directories on concurrnet backups problem
+- Improve the documentation and add LICENSE
+- *(README)* Fix header level
+- *(readme)* Update Installation methods
+
 ### 🚜 Refactor
 
 - Simplify rclone functions and use PathItem for paths
@@ -114,14 +118,6 @@
 - *(config)* Use a config singleton to make the config more accessible
 - *(utils)* Split utils file
 - Change the src directory to make the project packageable
-
-### 📚 Documentation
-
-- *(README)* Add warning
-- Create a to-do for fixing multiple directories on concurrnet backups problem
-- Improve the documentation and add LICENSE
-- *(README)* Fix header level
-- *(readme)* Update Installation methods
 
 ### ⚙️ Miscellaneous Tasks
 
