@@ -1,7 +1,12 @@
 ## [unreleased]
 
+### 🐛 Bug Fixes
+
+- *(operations)* Show empty paths log when there are empty paths
+
 ### 📚 Documentation
 
+- *(changelog)* Update CHANGELOG
 - *(changelog)* Update CHANGELOG
 ## [1.1.0] - 2026-06-25
 
