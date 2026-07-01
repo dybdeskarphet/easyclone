@@ -71,11 +71,11 @@ def start_backup(
         ),
     ] = False,
 ):
+    exit_if_currently_running()
     _setup_environment()
 
     async def start():
         exit_if_no_rclone()
-        exit_if_currently_running()
 
         _ipc_task = asyncio.create_task(ipc())
 
@@ -94,6 +94,7 @@ def daemon(
         ),
     ] = False,
 ):
+    exit_if_currently_running()
     _setup_environment()
 
     async def start():
@@ -101,7 +102,6 @@ def daemon(
         from easyclone.utypes.enums import LogLevel
 
         exit_if_no_rclone()
-        exit_if_currently_running()
 
         _ipc_task = asyncio.create_task(ipc())
 
