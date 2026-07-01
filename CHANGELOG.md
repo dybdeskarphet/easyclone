@@ -12,6 +12,11 @@
 
 - *(changelog)* Update CHANGELOG
 - *(changelog)* Update CHANGELOG
+- *(changelog)* Update CHANGELOG
+
+### ⚙️ Miscellaneous Tasks
+
+- *(systemd)* Add an example systemd service and timer
 ## [1.1.1] - 2026-06-30
 
 ### 🐛 Bug Fixes
