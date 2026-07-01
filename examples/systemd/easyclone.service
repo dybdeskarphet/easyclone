@@ -1,0 +1,11 @@
+[Unit]
+Description=Easyclone Backup Service
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/bin/easyclone start-backup
+
+[Install]
+WantedBy=default.target
