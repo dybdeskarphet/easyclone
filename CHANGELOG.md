@@ -1,7 +1,16 @@
 ## [unreleased]
 
+### 🚀 Features
+
+- Add daemon mode
+
+### 🐛 Bug Fixes
+
+- *(main)* Fix socket file being deleted when it belongs to an existing instance
+
 ### 💼 Other
 
+- *(changelog)* Update CHANGELOG
 - *(changelog)* Update CHANGELOG
 ## [1.1.1] - 2026-06-30
 
