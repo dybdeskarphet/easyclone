@@ -1,4 +1,7 @@
-from pydantic import BaseModel, model_validator
+import re
+from pydantic import BaseModel, field_validator, model_validator
+
+RCLONE_DURATION_RE = re.compile(r"^(\d+(ms|s|m|h|d|w|M|y))+$")
 
 
 class VersioningModel(BaseModel):
@@ -6,6 +9,7 @@ class VersioningModel(BaseModel):
     remote_name: str | None = None
     path: str | None = None
     timestamp: str = "%Y-%m-%d_%H-%M-%S"
+    prune_timeout: str | None = None
 
     @model_validator(mode="after")
     def validate_and_normalize_path(self):
@@ -17,6 +21,20 @@ class VersioningModel(BaseModel):
 
         self.path = self.path.strip("/")
         return self
+
+    @field_validator("prune_timeout")
+    @classmethod
+    def validate_rclone_duration(cls, v: str | None):
+        if v is not None:
+            v = v.strip()
+            if not v:
+                return None
+            if not RCLONE_DURATION_RE.match(v):
+                raise ValueError(
+                    "prune_timeout must be a valid Rclone duration (e.g., '30d', '24h', '1h30m')"
+                )
+
+        return v
 
 
 class BackupConfigModel(BaseModel):
