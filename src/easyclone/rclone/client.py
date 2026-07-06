@@ -1,6 +1,8 @@
 from datetime import datetime
 import asyncio
+from multiprocessing import process
 import shlex
+import subprocess
 from easyclone.config import cfg
 from easyclone.core.state import sync_status
 from easyclone.core.types import (
@@ -138,3 +140,73 @@ async def backup(
     ]
 
     return await asyncio.gather(*tasks)
+
+
+async def prune_archives(
+    remote: str,
+    archive_path: str,
+    prune_timeout: str,
+    rclone_args: list[str],
+    verbose: bool = False,
+):
+    all_args: list[str] = []
+    for arg in rclone_args:
+        all_args.extend(shlex.split(arg))
+
+    filtered_args = []
+    skip_next = False
+    for arg in all_args:
+        if skip_next:
+            skip_next = False
+            continue
+        if arg.startswith("--backup-dir="):
+            continue
+        if arg == "--backup-dir":
+            skip_next = True
+            continue
+        filtered_args.append(arg)
+
+    archive_dest = f"{remote}:{archive_path}"
+
+    delete_cmd = [
+        "rclone",
+        "delete",
+        archive_dest,
+        "--min-age",
+        prune_timeout,
+    ] + filtered_args
+    log(f"Pruning files older than {prune_timeout} in {archive_dest}", BackupLog.WAIT)
+
+    process_delete = await asyncio.create_subprocess_exec(
+        *delete_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
+    stdout, stderr = await process_delete.communicate()
+
+    if process_delete.returncode != 0:
+        log(
+            f"Failed to prune old files: {stderr.decode(errors='ignore').strip()}",
+            BackupLog.ERR,
+        )
+        return
+
+    rmdirs_cmd = ["rclone", "rmdirs", archive_dest, "--leave-root"] + filtered_args
+
+    log(f"Cleaning empty folders in {archive_dest}...", BackupLog.WAIT)
+    process_rmdirs = await asyncio.create_subprocess_exec(
+        *rmdirs_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
+    stdout_rm, stderr_rm = await process_rmdirs.communicate()
+
+    if process_rmdirs.returncode == 0:
+        log("Archive pruning completed successfully", BackupLog.OK)
+    else:
+        log(
+            f"Failed to clean empty directories: {stderr_rm.decode(errors='ignore').strip()}",
+            BackupLog.ERR,
+        )
+
+    if verbose:
+        if stdout:
+            log(stdout.decode(errors="ignore").strip(), LogLevel.LOG)
+        if stdout_rm:
+            log(stdout_rm.decode(errors="ignore").strip(), LogLevel.LOG)
