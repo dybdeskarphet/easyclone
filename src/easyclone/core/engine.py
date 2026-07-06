@@ -31,7 +31,10 @@ def make_backup_operation(
                 await sync_status.add_empty_path(path)
 
         _copy_folders_create_operation = await traverse_and_create_folders_by_depth(
-            root=dirs_root, rclone_args=cfg.rclone.args, verbose=verbose, semaphore=dirs_task_semaphore
+            root=dirs_root,
+            rclone_args=cfg.rclone.args,
+            verbose=verbose,
+            semaphore=dirs_task_semaphore,
         )
         _copy_operation = await backup(
             paths=paths["valid_paths"],

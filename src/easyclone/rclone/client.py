@@ -21,6 +21,7 @@ async def backup_command(
     dest: str,
     path_type: str,
     command_type: CommandType,
+    task_backup_dir: str,
     verbose: bool = False,
 ):
     cmd = rclone_command + [source, dest]
@@ -30,6 +31,12 @@ async def backup_command(
     process = await asyncio.create_subprocess_exec(
         *cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
+    if task_backup_dir.strip():
+        log(
+            f"Archiving the old version of {collapseuser(source)} to {task_backup_dir}",
+            BackupLog.WAIT,
+        )
+
     process_id = await sync_status.add_operation(
         source=source,
         dest=dest,
@@ -108,16 +115,22 @@ async def backup(
     # I have to do this because python doesn't have anon coroutines
     async def backup_task(source: str, dest: str, path_type: str):
         cmd_for_task = cmd.copy()
+        task_backup_dir = ""
         if cfg.backup.versioning.enable:
-            rel_source = source.lstrip("/")
-            task_backup_dir = (
-                f"{remote}:{cfg.backup.versioning.path}/{timestamp}/{rel_source}"
-            )
+            dest_prefix = f"{cfg.backup.remote_name}:{cfg.backup.root_dir}".strip("/")
+            archive_prefix = f"{remote}:{cfg.backup.versioning.path}/{timestamp}"
+            task_backup_dir = dest.replace(dest_prefix, archive_prefix)
             cmd_for_task += ["--backup-dir", task_backup_dir]
 
         async with semaphore:
             await backup_command(
-                cmd_for_task, source, dest, path_type, command_type, verbose
+                rclone_command=cmd_for_task,
+                source=source,
+                dest=dest,
+                path_type=path_type,
+                command_type=command_type,
+                task_backup_dir=task_backup_dir,
+                verbose=verbose,
             )
 
     tasks = [
