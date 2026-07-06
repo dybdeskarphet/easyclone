@@ -50,7 +50,7 @@ def create_dirs_array(path_list: list[PathItem]):
     for path in path_list:
         new_dir_path: PathItem
 
-        if path.get("type") == "dir":
+        if path.get("path_type") == "dir":
             new_dir_path = path
         else:
             new_dir_path = {
@@ -109,7 +109,9 @@ def create_dir_tree(path_list: list[PathItem]):
     return root
 
 
-async def create_folder_command(source: str, dest: str, rclone_args: list[str], verbose: bool):
+async def create_folder_command(
+    source: str, dest: str, rclone_args: list[str], verbose: bool
+):
     lsd_cmd = ["rclone", "lsd"]
     for arg in rclone_args:
         lsd_cmd += shlex.split(arg)
@@ -168,7 +170,10 @@ async def create_folder_command(source: str, dest: str, rclone_args: list[str], 
 
 
 async def create_folders_on_remote(
-    nodes: list[DirNode], rclone_args: list[str], semaphore: asyncio.Semaphore, verbose: bool
+    nodes: list[DirNode],
+    rclone_args: list[str],
+    semaphore: asyncio.Semaphore,
+    verbose: bool,
 ):
     async def mkdir_task(source: str, dest: str):
         async with semaphore:
@@ -193,7 +198,9 @@ async def traverse_and_create_folders_by_depth(
         node, depth = queue.popleft()
 
         if depth != current_depth:
-            await create_folders_on_remote(current_level_nodes, rclone_args, semaphore, verbose)
+            await create_folders_on_remote(
+                current_level_nodes, rclone_args, semaphore, verbose
+            )
             current_level_nodes = []
             current_depth = depth
 
@@ -203,4 +210,6 @@ async def traverse_and_create_folders_by_depth(
             queue.append((child, depth + 1))
 
     if current_level_nodes:
-        await create_folders_on_remote(current_level_nodes, rclone_args, semaphore, verbose)
+        await create_folders_on_remote(
+            current_level_nodes, rclone_args, semaphore, verbose
+        )
