@@ -1,8 +1,8 @@
 import asyncio
 import json
 
-from easyclone.utils.essentials import log
-from easyclone.utypes.enums import LogLevel
+from easyclone.utils.logging import log
+from easyclone.core.types import LogLevel
 
 SOCKET_PATH = "/tmp/easyclone.sock"
 

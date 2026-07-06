@@ -2,8 +2,7 @@ import json
 from ntpath import expanduser
 from pathlib import Path
 import os
-from easyclone.utypes.enums import FindMissingOptions, PathType
-from easyclone.utypes.models import OrganizedPaths, PathItem
+from easyclone.core.types import FindMissingOptions, PathType, OrganizedPaths, PathItem
 
 
 def organize_paths(paths: list[str], remote_name: str) -> OrganizedPaths:

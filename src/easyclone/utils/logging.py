@@ -1,8 +1,12 @@
-import os
-from easyclone.utypes.enums import LogLevel, BackupLog
+from __future__ import annotations
+from typing import TYPE_CHECKING
 
+if TYPE_CHECKING:
+    from easyclone.core.types import LogLevel, BackupLog
 
 def log(message: str, logtype: LogLevel | BackupLog) -> None:
+    from easyclone.core.types import LogLevel, BackupLog
+    
     color = "\033[32;1m"
 
     match logtype:
@@ -24,27 +28,3 @@ def log(message: str, logtype: LogLevel | BackupLog) -> None:
         full_msg = full_msg + ":"
 
     print(f"{full_msg}\033[0m {message}")
-
-
-def is_tool(name: str):
-    from shutil import which
-
-    return which(name) is not None
-
-
-def exit_if_no_rclone():
-    if not is_tool("rclone"):
-        log(
-            "Rclone is not installed on your system, 'rclone' command should be in the $PATH.",
-            LogLevel.ERROR,
-        )
-        exit(1)
-
-
-def exit_if_currently_running():
-    if os.path.exists("/tmp/easyclone.sock"):
-        log(
-            "Easyclone is already running. Delete /tmp/easyclone.sock if you think this is a mistake.",
-            LogLevel.WARN,
-        )
-        exit(1)

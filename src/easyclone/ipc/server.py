@@ -1,22 +1,28 @@
 import asyncio
 import json
 from pathlib import Path
-from easyclone.utypes.enums import LogLevel
-from easyclone.shared import sync_status
-from easyclone.utils.essentials import log
+from easyclone.core.types import LogLevel
+from easyclone.core.state import sync_status
+from easyclone.utils.logging import log
 
 SOCKET_PATH = "/tmp/easyclone.sock"
+
 
 async def handle_client(_reader: asyncio.StreamReader, writer: asyncio.StreamWriter):
     try:
         while True:
-            message = json.dumps({
-                "total_path_count": await sync_status.get_total_path(),
-                "finished_path_count": await sync_status.get_currently_finished(),
-                "empty_paths": await sync_status.get_empty_paths(),
-                "operation_count": await sync_status.get_operation_count(),
-                "operations": await sync_status.get_operations()
-            }).encode() + b"\n"
+            message = (
+                json.dumps(
+                    {
+                        "total_path_count": await sync_status.get_total_path(),
+                        "finished_path_count": await sync_status.get_currently_finished(),
+                        "empty_paths": await sync_status.get_empty_paths(),
+                        "operation_count": await sync_status.get_operation_count(),
+                        "operations": await sync_status.get_operations(),
+                    }
+                ).encode()
+                + b"\n"
+            )
 
             writer.write(message)
 
@@ -33,13 +39,17 @@ async def handle_client(_reader: asyncio.StreamReader, writer: asyncio.StreamWri
         except BrokenPipeError:
             pass
 
+
 async def start_status_server():
     try:
         Path(SOCKET_PATH).unlink()
     except FileNotFoundError as e:
         pass
     except Exception as e:
-        log(f"Something happened while connecting to the socket for status server: {e}", LogLevel.ERROR)
+        log(
+            f"Something happened while connecting to the socket for status server: {e}",
+            LogLevel.ERROR,
+        )
         raise
 
     try:

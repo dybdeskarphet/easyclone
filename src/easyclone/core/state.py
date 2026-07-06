@@ -1,7 +1,6 @@
 import asyncio
-from easyclone.utypes.enums import BackupStatus, RcloneOperationType
-from easyclone.utypes.models import SyncStatusItem
 import uuid
+from easyclone.core.types import BackupStatus, RcloneOperationType, SyncStatusItem
 
 
 class SyncStatus:
@@ -85,3 +84,7 @@ class SyncStatus:
     async def get_empty_paths(self):
         async with self.lock:
             return self.empty_paths
+
+
+sync_status = SyncStatus()
+

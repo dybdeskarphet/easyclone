@@ -3,8 +3,7 @@ import json
 from threading import Lock
 from os import getenv
 from pathlib import Path
-from easyclone.utypes.enums import LogLevel
-from easyclone.utypes.config import BackupConfigModel, ConfigModel, DaemonConfigModel
+from easyclone.config.models import BackupConfigModel, ConfigModel, DaemonConfigModel
 import toml
 
 
@@ -37,7 +36,7 @@ class Config:
             daemon=DaemonConfigModel(
                 interval=60,
                 countdown=False,
-            )
+            ),
         )
 
         if xdg_config_home:
@@ -62,7 +61,8 @@ class Config:
         return config
 
     def _load_config(self):
-        from easyclone.utils.essentials import log
+        from easyclone.utils.logging import log
+        from easyclone.core.types import LogLevel
 
         self._get_config_path()
 

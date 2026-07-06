@@ -1,9 +1,9 @@
 from __future__ import annotations
 import asyncio
-from easyclone.shared import sync_status
-from easyclone.utils.essentials import log
-from easyclone.utypes.models import PathItem
-from easyclone.utypes.enums import (
+from easyclone.core.state import sync_status
+from easyclone.utils.logging import log
+from easyclone.core.types import (
+    PathItem,
     BackupLog,
     BackupStatus,
     LogLevel,
@@ -11,6 +11,7 @@ from easyclone.utypes.enums import (
     RcloneOperationType,
 )
 import os
+import shlex
 from pathlib import Path
 from collections import deque
 from easyclone.config import cfg
@@ -108,8 +109,12 @@ def create_dir_tree(path_list: list[PathItem]):
     return root
 
 
-async def create_folder_command(source: str, dest: str, verbose: bool):
-    lsd_cmd = ["rclone", "lsd", dest]
+async def create_folder_command(source: str, dest: str, rclone_args: list[str], verbose: bool):
+    lsd_cmd = ["rclone", "lsd"]
+    for arg in rclone_args:
+        lsd_cmd += shlex.split(arg)
+    lsd_cmd.append(dest)
+
     log(f"Checking if directory exist at {dest}", BackupLog.WAIT)
 
     process = await asyncio.create_subprocess_exec(
@@ -121,7 +126,10 @@ async def create_folder_command(source: str, dest: str, verbose: bool):
         log(f"Directory exist at {dest}", BackupLog.OK)
         return
 
-    mkdir_cmd = ["rclone", "mkdir", dest]
+    mkdir_cmd = ["rclone", "mkdir"]
+    for arg in rclone_args:
+        mkdir_cmd += shlex.split(arg)
+    mkdir_cmd.append(dest)
 
     log(f"Creating a directory at {dest}", BackupLog.WAIT)
     process = await asyncio.create_subprocess_exec(
@@ -160,11 +168,11 @@ async def create_folder_command(source: str, dest: str, verbose: bool):
 
 
 async def create_folders_on_remote(
-    nodes: list[DirNode], semaphore: asyncio.Semaphore, verbose: bool
+    nodes: list[DirNode], rclone_args: list[str], semaphore: asyncio.Semaphore, verbose: bool
 ):
     async def mkdir_task(source: str, dest: str):
         async with semaphore:
-            await create_folder_command(source, dest, verbose)
+            await create_folder_command(source, dest, rclone_args, verbose)
 
     tasks = [
         mkdir_task(node.details.get("source"), node.details.get("dest"))
@@ -175,7 +183,7 @@ async def create_folders_on_remote(
 
 
 async def traverse_and_create_folders_by_depth(
-    root: DirNode, verbose: bool, semaphore: asyncio.Semaphore
+    root: DirNode, rclone_args: list[str], verbose: bool, semaphore: asyncio.Semaphore
 ):
     queue = deque([(root, 0)])
     current_depth = 0
@@ -185,7 +193,7 @@ async def traverse_and_create_folders_by_depth(
         node, depth = queue.popleft()
 
         if depth != current_depth:
-            await create_folders_on_remote(current_level_nodes, semaphore, verbose)
+            await create_folders_on_remote(current_level_nodes, rclone_args, semaphore, verbose)
             current_level_nodes = []
             current_depth = depth
 
@@ -195,4 +203,4 @@ async def traverse_and_create_folders_by_depth(
             queue.append((child, depth + 1))
 
     if current_level_nodes:
-        await create_folders_on_remote(current_level_nodes, semaphore, verbose)
+        await create_folders_on_remote(current_level_nodes, rclone_args, semaphore, verbose)

@@ -4,13 +4,13 @@ from typing import Annotated, Any
 from easyclone.config import cfg
 from easyclone.ipc.client import listen_ipc
 from easyclone.ipc.server import start_status_server
-from easyclone.rclone.operations import make_backup_operation
+from easyclone.core.engine import make_backup_operation
+from easyclone.core.state import sync_status
 from easyclone.utils.path import collapseuser, find_missing
 import typer
 import json
-from easyclone.shared import sync_status
-from easyclone.utils.essentials import exit_if_currently_running, exit_if_no_rclone
-from easyclone.utypes.enums import CommandType, FindMissingOptions
+from easyclone.utils.system import exit_if_currently_running, exit_if_no_rclone
+from easyclone.core.types import CommandType, FindMissingOptions
 
 app = typer.Typer(
     help="Very convenient Rclone bulk backup wrapper",
@@ -44,8 +44,8 @@ def _setup_environment():
     import signal
     from types import FrameType
     from easyclone.ipc.client import SOCKET_PATH
-    from easyclone.utils.essentials import log
-    from easyclone.utypes.enums import LogLevel
+    from easyclone.utils.logging import log
+    from easyclone.core.types import LogLevel
 
     def cleanup():
         if path.exists(SOCKET_PATH):
@@ -98,8 +98,8 @@ def daemon(
     _setup_environment()
 
     async def start():
-        from easyclone.utils.essentials import log
-        from easyclone.utypes.enums import LogLevel
+        from easyclone.utils.logging import log
+        from easyclone.core.types import LogLevel
 
         exit_if_no_rclone()
 
