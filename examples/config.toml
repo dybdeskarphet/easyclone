@@ -1,28 +1,65 @@
+# ==============================================================================
+# EasyClone Example Configuration
+# ==============================================================================
+
 [rclone]
+# Rclone flags passed to every sync/copy/lsd/mkdir subprocess call.
+# You can customize performance settings, timeouts, filters, etc., here.
 args = [
-  "--update",
-  "--verbose",
-  "--transfers 30",
-  "--checkers 8",
-  "--contimeout 60s",
-  "--timeout 300s",
-  "--retries 3",
-  "--low-level-retries 10",
-  "--stats 1s"
+  "--update",               # Skip files that are newer on the destination
+  "--verbose",              # Enable detailed rclone transfer logging
+  "--transfers 30",         # Number of file transfers to run concurrently
+  "--checkers 8",           # Number of checkers to run concurrently
+  "--contimeout 60s",       # Connection timeout limit
+  "--timeout 300s",         # Idle timeout limit
+  "--retries 3",            # Retry operations on transient errors up to 3 times
+  "--low-level-retries 10", # Retry low-level operations (like chunk uploads)
+  "--stats 1s",             # Interval between progress stats printing
 ]
+
+# Maximum number of concurrent path sync/copy commands allowed to execute at once.
+# For example, if you have 10 paths configured, this limits how many run in parallel.
 concurrent_limit = 2
 
+
 [backup]
+# The name of the rclone remote configuration (defined in your ~/.config/rclone/rclone.conf)
 remote_name = "GoogleDrive"
+
+# The destination root directory on your remote cloud storage where backups are placed
 root_dir = "Backups/My PC/"
+
+# List of directory/file paths to perform 'sync' operations on.
+# Sync mirrors the source: if a file is deleted locally, it will be deleted on the remote.
 sync_paths = [
-  "$XDG_CONFIG_HOME",
-  "~/test/test_dir",
+  "$XDG_CONFIG_HOME", # Supports environment variables
+  "~/test/test_dir",  # Supports home directory tilde expansion
   "~/test/test_file",
-  "/etc/motd"
+  "/etc/motd",
 ]
 
-copy_paths = [
-  "~/test_2/1.dat",
-  "/etc/motd"
-]
+# List of directory/file paths to perform 'copy' operations on.
+# Copy only adds new/modified files; it will NEVER delete files on the remote.
+copy_paths = ["~/test_2/1.dat", "/etc/motd"]
+
+
+[backup.versioning]
+# Enable simple versioning of modified or deleted files using Rclone's --backup-dir mechanism
+enable = false
+
+# Optional remote name. If omitted or left empty, defaults to backup.remote_name
+remote_name = "GoogleDrive"
+
+# Directory path on the remote where archived files are stored
+path = "Backups/My PC/Archive"
+
+# Date/time format folder name suffix to categorize each backup session (Python strftime format)
+timestamp = "%Y-%m-%d_%H-%M-%S"
+
+
+[daemon]
+# Time interval in minutes between periodic daemon backups when running the daemon command
+interval = 60
+
+# Display a countdown timer in the terminal during the waiting period
+countdown = false
