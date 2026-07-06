@@ -2,6 +2,20 @@
 
 ### 🚀 Features
 
+- Introduce versioning system with --backup-dir
+
+### 💼 Other
+
+- *(changelog)* Update CHANGELOG
+- *(config.toml)* Add the new flags, fields and populate with explanatory comments
+
+### ⚙️ Miscellaneous Tasks
+
+- Reshape the file structure entirely
+## [1.2.0] - 2026-07-02
+
+### 🚀 Features
+
 - Add daemon mode
 
 ### 🐛 Bug Fixes
