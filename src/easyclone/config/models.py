@@ -1,4 +1,22 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, model_validator
+
+
+class VersioningModel(BaseModel):
+    enable: bool = False
+    remote_name: str | None = None
+    path: str | None = None
+    timestamp: str = "%Y-%m-%d_%H-%M-%S"
+
+    @model_validator(mode="after")
+    def validate_and_normalize_path(self):
+        if not self.enable:
+            return self
+
+        if not self.path or not self.path.strip():
+            raise ValueError("path must be specified when versioning is enabled")
+
+        self.path = self.path.strip("/")
+        return self
 
 
 class BackupConfigModel(BaseModel):
@@ -7,6 +25,7 @@ class BackupConfigModel(BaseModel):
     remote_name: str
     root_dir: str
     verbose_log: bool = False
+    versioning: VersioningModel = VersioningModel()
 
 
 class RcloneConfigModel(BaseModel):

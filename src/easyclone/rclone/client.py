@@ -1,5 +1,7 @@
+from datetime import datetime
 import asyncio
 import shlex
+from easyclone.config import cfg
 from easyclone.core.state import sync_status
 from easyclone.core.types import (
     BackupLog,
@@ -71,14 +73,52 @@ async def backup(
 ):
     cmd = ["rclone", command_type.value]
 
+    all_args: list[str] = []
     for arg in rclone_args:
-        parts = shlex.split(arg)
-        cmd += parts
+        all_args.extend(shlex.split(arg))
+
+    remote = None
+    timestamp = None
+    filtered_args: list[str] = []
+    if cfg.backup.versioning.enable:
+        skip_next = False
+        for arg in all_args:
+            if skip_next:
+                skip_next = False
+                continue
+
+            if arg.startswith("--backup-dir="):
+                continue
+
+            if arg == "--backup-dir":
+                skip_next = True
+                continue
+
+            filtered_args.append(arg)
+
+        remote = cfg.backup.versioning.remote_name
+        timestamp = datetime.now().strftime(cfg.backup.versioning.timestamp)
+        if not remote or not remote.strip():
+            remote = cfg.backup.remote_name
+    else:
+        filtered_args = all_args
+
+    cmd += filtered_args
 
     # I have to do this because python doesn't have anon coroutines
     async def backup_task(source: str, dest: str, path_type: str):
+        cmd_for_task = cmd.copy()
+        if cfg.backup.versioning.enable:
+            rel_source = source.lstrip("/")
+            task_backup_dir = (
+                f"{remote}:{cfg.backup.versioning.path}/{timestamp}/{rel_source}"
+            )
+            cmd_for_task += ["--backup-dir", task_backup_dir]
+
         async with semaphore:
-            await backup_command(cmd, source, dest, path_type, command_type, verbose)
+            await backup_command(
+                cmd_for_task, source, dest, path_type, command_type, verbose
+            )
 
     tasks = [
         backup_task(path["source"], path["dest"], path["path_type"]) for path in paths
