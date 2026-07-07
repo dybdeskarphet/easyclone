@@ -37,6 +37,26 @@ async def _run_backup_operations(verbose_state: bool):
         CommandType.SYNC, cfg.backup.sync_paths, verbose_state
     )()
 
+    v_cfg = cfg.backup.versioning
+    if v_cfg.enable and v_cfg.prune_timeout:
+        remote = v_cfg.remote_name
+        if not remote or not remote.strip():
+            remote = cfg.backup.remote_name
+
+        # path is already checked in the model's validator, this is just for LSP to shut up
+        assert v_cfg.path is not None
+
+        from easyclone.rclone.client import prune_archives_by_folder
+
+        await prune_archives_by_folder(
+            remote=remote,
+            archive_path=v_cfg.path,
+            prune_timeout=v_cfg.prune_timeout,
+            timestamp_format=v_cfg.timestamp,
+            rclone_args=cfg.rclone.args,
+            verbose=verbose_state,
+        )
+
 
 def _setup_environment():
     import atexit

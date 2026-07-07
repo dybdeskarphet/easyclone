@@ -1,5 +1,6 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import asyncio
+import re
 from multiprocessing import process
 import shlex
 import subprocess
@@ -105,8 +106,8 @@ async def backup(
 
             filtered_args.append(arg)
 
-        remote = cfg.backup.versioning.remote_name
         timestamp = datetime.now().strftime(cfg.backup.versioning.timestamp)
+        remote = cfg.backup.versioning.remote_name
         if not remote or not remote.strip():
             remote = cfg.backup.remote_name
     else:
@@ -142,13 +143,23 @@ async def backup(
     return await asyncio.gather(*tasks)
 
 
-async def prune_archives(
+async def prune_archives_by_folder(
     remote: str,
     archive_path: str,
     prune_timeout: str,
+    timestamp_format: str,
     rclone_args: list[str],
     verbose: bool = False,
 ):
+    match = re.match(r"^(\d+)([dhms])$", prune_timeout.strip())
+    if not match:
+        log(f"Invalid prune_timeout format: {prune_timeout}", BackupLog.ERR)
+        return
+
+    value, unit = int(match.group(1)), match.group(2)
+    delta_map = {"d": "days", "h": "hours", "m": "minutes", "s": "seconds"}
+    cutoff_date = datetime.now() - timedelta(**{delta_map[unit]: value})
+
     all_args: list[str] = []
     for arg in rclone_args:
         all_args.extend(shlex.split(arg))
@@ -166,47 +177,69 @@ async def prune_archives(
             continue
         filtered_args.append(arg)
 
+    purge_args = []
+    skip_val = False
+    for arg in filtered_args:
+        if skip_val:
+            skip_val = False
+            continue
+        if arg in (
+            "--exclude",
+            "--exclude-from",
+            "--include",
+            "--include-from",
+            "--filter",
+            "--filter-from",
+        ):
+            skip_val = True
+            continue
+        if arg.startswith(("--exclude=", "--include=", "--filter=")):
+            continue
+        purge_args.append(arg)
+
     archive_dest = f"{remote}:{archive_path}"
 
-    delete_cmd = [
-        "rclone",
-        "delete",
-        archive_dest,
-        "--min-age",
-        prune_timeout,
-    ] + filtered_args
-    log(f"Pruning files older than {prune_timeout} in {archive_dest}", BackupLog.WAIT)
-
-    process_delete = await asyncio.create_subprocess_exec(
-        *delete_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    list_cmd = ["rclone", "lsf", "--dirs-only", archive_dest] + filtered_args
+    process = await asyncio.create_subprocess_exec(
+        *list_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
     )
-    stdout, stderr = await process_delete.communicate()
+    stdout, stderr = await process.communicate()
 
-    if process_delete.returncode != 0:
-        log(
-            f"Failed to prune old files: {stderr.decode(errors='ignore').strip()}",
-            BackupLog.ERR,
-        )
+    if process.returncode != 0:
         return
 
-    rmdirs_cmd = ["rclone", "rmdirs", archive_dest, "--leave-root"] + filtered_args
+    folders = stdout.decode(errors="ignore").strip().split("\n")
 
-    log(f"Cleaning empty folders in {archive_dest}...", BackupLog.WAIT)
-    process_rmdirs = await asyncio.create_subprocess_exec(
-        *rmdirs_cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
-    )
-    stdout_rm, stderr_rm = await process_rmdirs.communicate()
+    for folder in folders:
+        folder = folder.strip("/")
+        if not folder:
+            continue
 
-    if process_rmdirs.returncode == 0:
-        log("Archive pruning completed successfully", BackupLog.OK)
-    else:
-        log(
-            f"Failed to clean empty directories: {stderr_rm.decode(errors='ignore').strip()}",
-            BackupLog.ERR,
-        )
+        try:
+            folder_date = datetime.strptime(folder, timestamp_format)
+            if folder_date < cutoff_date:
+                log(f"Purging expired archive folder: {folder}...", BackupLog.WAIT)
+                purge_cmd = ["rclone", "purge", f"{archive_dest}/{folder}"] + purge_args
+                process_purge = await asyncio.create_subprocess_exec(
+                    *purge_cmd,
+                    stdout=asyncio.subprocess.PIPE,
+                    stderr=asyncio.subprocess.PIPE,
+                )
+                stdout_p, stderr_p = await process_purge.communicate()
 
-    if verbose:
-        if stdout:
-            log(stdout.decode(errors="ignore").strip(), LogLevel.LOG)
-        if stdout_rm:
-            log(stdout_rm.decode(errors="ignore").strip(), LogLevel.LOG)
+                if process_purge.returncode == 0:
+                    log(
+                        f"Purged expired archive folder successfully: {folder}",
+                        BackupLog.OK,
+                    )
+                else:
+                    log(
+                        f"Failed to purge folder {folder}: {stderr_p.decode(errors='ignore').strip()}",
+                        BackupLog.ERR,
+                    )
+
+                if verbose:
+                    if stdout_p:
+                        log(stdout_p.decode(errors="ignore").strip(), LogLevel.LOG)
+        except ValueError:
+            continue
