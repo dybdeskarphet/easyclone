@@ -1,8 +1,3 @@
-## [unreleased]
-
-### 📚 Documentation
-
-- *(changelog)* Update CHANGELOG
 ## [1.3.0] - 2026-07-07
 
 ### 🚀 Features
@@ -19,9 +14,7 @@
 
 ### 📚 Documentation
 
-- *(changelog)* Update CHANGELOG
 - *(config.toml)* Add the new flags, fields and populate with explanatory comments
-- *(changelog)* Update CHANGELOG
 - *(config.toml)* Add prune_timeout to example config
 
 ### ⚙️ Miscellaneous Tasks
@@ -38,13 +31,6 @@
 
 - *(main)* Fix socket file being deleted when it belongs to an existing instance
 
-### 📚 Documentation
-
-- *(changelog)* Update CHANGELOG
-- *(changelog)* Update CHANGELOG
-- *(changelog)* Update CHANGELOG
-- *(changelog)* Update CHANGELOG
-
 ### ⚙️ Miscellaneous Tasks
 
 - *(systemd)* Add an example systemd service and timer
@@ -54,13 +40,6 @@
 ### 🐛 Bug Fixes
 
 - *(operations)* Show empty paths log when there are empty paths
-
-### 📚 Documentation
-
-- *(changelog)* Update CHANGELOG
-- *(changelog)* Update CHANGELOG
-- *(changelog)* Update CHANGELOG
-- *(changelog)* Update CHANGELOG
 
 ### ⚙️ Miscellaneous Tasks
 
@@ -74,10 +53,7 @@
 
 ### 📚 Documentation
 
-- *(CHANGELOG)* Add CHANGELOG with git-cliff
-- *(pyproject)* Add changelog link to pyproject.toml
 - *(README)* Add shields
-- *(changelog)* Update CHANGELOG
 
 ### ⚙️ Miscellaneous Tasks
 
