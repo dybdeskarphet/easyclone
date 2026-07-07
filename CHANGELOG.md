@@ -3,15 +3,26 @@
 ### 🚀 Features
 
 - Introduce versioning system with --backup-dir
+- *(client)* Log the archive path if versioning is enabled
+- *(models)* Add prune_timeout for the future use of pruning logic
+- *(client)* Add archive prune logic
 
-### 💼 Other
+### 🐛 Bug Fixes
+
+- *(tree)* Check path_type in create_dirs_array
+- *(client)* Fix file deletion deletion for pruning
+
+### 📚 Documentation
 
 - *(changelog)* Update CHANGELOG
 - *(config.toml)* Add the new flags, fields and populate with explanatory comments
+- *(changelog)* Update CHANGELOG
+- *(config.toml)* Add prune_timeout to example config
 
 ### ⚙️ Miscellaneous Tasks
 
 - Reshape the file structure entirely
+- *(release)* Bump version
 ## [1.2.0] - 2026-07-02
 
 ### 🚀 Features
@@ -22,7 +33,7 @@
 
 - *(main)* Fix socket file being deleted when it belongs to an existing instance
 
-### 💼 Other
+### 📚 Documentation
 
 - *(changelog)* Update CHANGELOG
 - *(changelog)* Update CHANGELOG
@@ -39,7 +50,7 @@
 
 - *(operations)* Show empty paths log when there are empty paths
 
-### 💼 Other
+### 📚 Documentation
 
 - *(changelog)* Update CHANGELOG
 - *(changelog)* Update CHANGELOG
@@ -56,7 +67,7 @@
 
 - Add the get-missing command for checking missing files and dirs
 
-### 💼 Other
+### 📚 Documentation
 
 - *(CHANGELOG)* Add CHANGELOG with git-cliff
 - *(pyproject)* Add changelog link to pyproject.toml
@@ -66,7 +77,6 @@
 ### ⚙️ Miscellaneous Tasks
 
 - Fix formatting
-- *(cliff)* Add auto CHANGELOG updater
 - *(release)* Add auto release creator
 - *(pypi)* Add auto pypi publisher
 - *(release)* Bump version
@@ -83,8 +93,11 @@
 
 ### 💼 Other
 
-- *(examples)* Update the example config
 - Bump version
+
+### 📚 Documentation
+
+- *(examples)* Update the example config
 ## [0.3.0] - 2025-07-15
 
 ### 🚀 Features
@@ -96,6 +109,9 @@
 
 - Bump version
 - Bump version
+
+### 📚 Documentation
+
 - *(README)* Update README
 ## [0.2.0] - 2025-07-06
 
@@ -137,14 +153,6 @@
 - *(ipc.client)* Exit with 1 if no tasks are running
 - *(main)* Make get-status show the entire JSON if all the flags are passed
 
-### 💼 Other
-
-- *(README)* Add warning
-- Create a to-do for fixing multiple directories on concurrnet backups problem
-- Improve the documentation and add LICENSE
-- *(README)* Fix header level
-- *(readme)* Update Installation methods
-
 ### 🚜 Refactor
 
 - Simplify rclone functions and use PathItem for paths
@@ -153,6 +161,14 @@
 - *(config)* Use a config singleton to make the config more accessible
 - *(utils)* Split utils file
 - Change the src directory to make the project packageable
+
+### 📚 Documentation
+
+- *(README)* Add warning
+- Create a to-do for fixing multiple directories on concurrnet backups problem
+- Improve the documentation and add LICENSE
+- *(README)* Fix header level
+- *(readme)* Update Installation methods
 
 ### ⚙️ Miscellaneous Tasks
 
