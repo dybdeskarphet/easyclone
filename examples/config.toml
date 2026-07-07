@@ -56,6 +56,10 @@ path = "Backups/My PC/Archive"
 # Date/time format folder name suffix to categorize each backup session (Python strftime format)
 timestamp = "%Y-%m-%d_%H-%M-%S"
 
+# Optional duration timeout to prune (delete) old archive folders (e.g. '30d', '7d', '24h', '30m')
+prune_timeout = "30d"
+
+
 
 [daemon]
 # Time interval in minutes between periodic daemon backups when running the daemon command
