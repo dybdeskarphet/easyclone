@@ -1,5 +1,10 @@
 ## [unreleased]
 
+### 📚 Documentation
+
+- *(changelog)* Update CHANGELOG
+## [1.3.0] - 2026-07-07
+
 ### 🚀 Features
 
 - Introduce versioning system with --backup-dir
