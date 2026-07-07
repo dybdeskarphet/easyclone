@@ -59,6 +59,7 @@ protect_breaking_commits = false
 # Assigns commits to groups.
 # Optionally sets the commit's scope and can decide to exclude commits from further processing.
 commit_parsers = [
+  { message = "(?i)changelog", skip = true },
   { message = "^feat", group = "<!-- 0 -->🚀 Features" },
   { message = "^fix", group = "<!-- 1 -->🐛 Bug Fixes" },
   { message = "^perf", group = "<!-- 4 -->⚡ Performance" },
@@ -70,7 +71,6 @@ commit_parsers = [
   { message = "^chore\\(deps.*\\)", skip = true },
   { message = "^chore\\(pr\\)", skip = true },
   { message = "^chore\\(pull\\)", skip = true },
-  { message = "(?i)changelog", skip = true },
   { message = "^chore|^ci", group = "<!-- 7 -->⚙️ Miscellaneous Tasks" },
   { body = ".*security", group = "<!-- 8 -->🛡️ Security" },
   { message = "^revert", group = "<!-- 9 -->◀️ Revert" },
