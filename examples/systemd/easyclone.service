@@ -5,6 +5,9 @@ After=network-online.target
 
 [Service]
 Type=oneshot
+Nice=19
+IOSchedulingClass=idle
+TimeoutStopSec=60s
 ExecStart=%h/.local/bin/easyclone start-backup
 
 [Install]
