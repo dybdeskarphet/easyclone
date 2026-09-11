@@ -3,6 +3,7 @@
 ### ⚙️ Miscellaneous Tasks
 
 - *(systemd)* Throttle the service in case of high concurrent limits
+- *(nix)* Add package and module configuration
 ## [1.3.0] - 2026-07-07
 
 ### 🚀 Features
