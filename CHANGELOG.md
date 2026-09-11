@@ -1,5 +1,9 @@
 ## [unreleased]
 
+### 🐛 Bug Fixes
+
+- *(nix)* Use pkgs.stdenv... instead of pkgs.system
+
 ### ⚙️ Miscellaneous Tasks
 
 - *(systemd)* Throttle the service in case of high concurrent limits
